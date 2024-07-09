@@ -31,13 +31,20 @@ module "naming" {
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
-  location = "MYLOCATION"
+  location = "centalindia"
 }
 
 # This is the module call
-module "MYMODULE" {
+module "azurerm_automation_account" {
   source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  enable_telemetry = var.enable_telemetry
-  # ...
+  name                = "example-account"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku           = "Basic"
+  
+
+  tags = {
+    environment = "development"
+  }
+
 }
