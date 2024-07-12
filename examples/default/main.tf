@@ -31,20 +31,41 @@ module "naming" {
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
-  location = "centalindia"
+  location = "centralindia"
 }
+
+data "azurerm_client_config" "example" {}
 
 # This is the module call
 module "azurerm_automation_account" {
   source = "../../"
   name                = "example-account"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
   sku           = "Basic"
-  
-
   tags = {
     environment = "development"
   }
+automation_certificate = {
+  name = "example-certificate"
+  resource_group_name = azurerm_resource_group.this.name
+  automation_account_name = "example-account"
+  description = "This is an example certificate"
+  base64 = filebase64("certificate.pfx")
+  exportable = true
+}
 
+automation_connection = {
+  name = "example-connection"
+  resource_group_name = azurerm_resource_group.this.name
+  automation_account_name = "example-account"
+  description = "This is an example connection"
+  type = "AzureServicePrincipal"
+  values = {
+    "ApplicationId" : "3ff01f1c-3fd0-4875-bb11-b3beb05fe07e", #"00000000-0000-0000-0000-000000000000",
+    "TenantId" : data.azurerm_client_config.example.tenant_id,
+    "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
+    "CertificateThumbprint" : "sample-certificate-thumbprint",
+  }
+}
 }
