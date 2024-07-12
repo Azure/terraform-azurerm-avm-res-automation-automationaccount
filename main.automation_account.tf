@@ -10,7 +10,7 @@ resource "azurerm_automation_account" "this" {
   dynamic "encryption" {
     for_each = var.encryption == null ? [] : var.encryption
     content {
-      key_vault_key_id          = encryption.value.key_vault_key_id
+      key_vault_key_id = encryption.value.key_vault_key_id
       #key_source                = encryption.value.key_source #This is deprecated
       user_assigned_identity_id = encryption.value.user_assigned_identity_id
     }
