@@ -47,25 +47,28 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 automation_certificate = {
-  name = "example-certificate"
-  resource_group_name = azurerm_resource_group.this.name
-  automation_account_name = "example-account"
-  description = "This is an example certificate"
-  base64 = filebase64("certificate.pfx")
-  exportable = true
+  auto_cert_key1 = { 
+    name = "example-certificate"
+    resource_group_name = azurerm_resource_group.this.name
+    automation_account_name = "example-account"
+    description = "This is an example certificate"
+    base64 = filebase64("certificate.pfx")
+    exportable = true
+  }
 }
-
 automation_connection = {
-  name = "example-connection"
-  resource_group_name = azurerm_resource_group.this.name
-  automation_account_name = "example-account"
-  description = "This is an example connection"
-  type = "AzureServicePrincipal"
-  values = {
-    "ApplicationId" : "3ff01f1c-3fd0-4875-bb11-b3beb05fe07e", #"00000000-0000-0000-0000-000000000000",
-    "TenantId" : data.azurerm_client_config.example.tenant_id,
-    "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
-    "CertificateThumbprint" : "sample-certificate-thumbprint",
+  auto_conn_key1 = {
+    name = "example-connection"
+    resource_group_name = azurerm_resource_group.this.name
+    automation_account_name = "example-account"
+    description = "This is an example connection"
+    type = "AzureServicePrincipal"
+    values = {
+      "ApplicationId" : "3ff01f1c-3fd0-4875-bb11-b3beb05fe07e", #"00000000-0000-0000-0000-000000000000",
+      "TenantId" : data.azurerm_client_config.example.tenant_id,
+      "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
+      "CertificateThumbprint" : "sample-certificate-thumbprint",
+    }
   }
 }
 }

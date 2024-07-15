@@ -94,7 +94,7 @@ EOT
 }
 
 variable "automation_certificate" {
-  type        = object({
+  type        = map(object({
     name        = string
     base64      = string
     resource_group_name = string
@@ -107,7 +107,7 @@ variable "automation_certificate" {
       read   = optional(string)
       update = optional(string)
     }))
-  })
+  }))
   description = <<-EOT
   A list of Automation Certificates which should be created in this Automation Account.
     `name` - (Required) The name of the Certificate.
@@ -122,7 +122,7 @@ EOT
 }
 
 variable "automation_connection" {
-  type        = object({
+  type        = map(object({
     name        = string
     resource_group_name = string
     automation_account_name = string
@@ -135,7 +135,7 @@ variable "automation_connection" {
       read   = optional(string)
       update = optional(string)
     }))
-  })
+  }))
   description = <<-EOT
   A list of Automation Connections which should be created in this Automation Account.
     `name` - (Required) The name of the Connection.
