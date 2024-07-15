@@ -7,11 +7,14 @@ for_each = var.automation_connection != null ? var.automation_connection : {}
   values                  = each.value.values
   description             = each.value.description
   
-  timeouts {
-    create = each.value.timeouts.create
-    delete = each.value.timeouts.delete
-    read   = each.value.timeouts.read
-    update = each.value.timeouts.update
+  dynamic "timeouts" {
+    for_each = each.value.timeouts != null ? { "dummy_key": each.value.timeouts } : {}
+    content {
+      create = each.value.timeouts.create
+      delete = each.value.timeouts.delete
+      read   = each.value.timeouts.read
+      update = each.value.timeouts.update
+    }
   }
 }
 
