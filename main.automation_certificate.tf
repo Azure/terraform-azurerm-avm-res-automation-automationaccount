@@ -1,20 +1,19 @@
 resource "azurerm_automation_certificate" "this" {
-#for_each = var.automation_certificate == null ? [] : { for idx, cert in var.automation_certificate : idx => cert }
-
-  automation_account_name = var.automation_certificate.automation_account_name
-  base64                  = var.automation_certificate.base64
-  name                    = var.automation_certificate.name
-  resource_group_name     = var.automation_certificate.resource_group_name
-  description             = var.automation_certificate.description
-  exportable              = var.automation_certificate.exportable
+  for_each                = var.automation_certificate != null ? var.automation_certificate : {}
+  automation_account_name = azurerm_automation_account.this.name
+  name                    = each.value.name
+  resource_group_name     = azurerm_automation_account.this.resource_group_name
+  base64                  = each.value.base64
+  description             = each.value.description
+  exportable              = each.value.exportable
 
   dynamic "timeouts" {
-    for_each = var.automation_certificate.timeouts == null ? [] : [var.automation_certificate.timeouts]
+    for_each = each.value.timeouts != null ? { "dummy_key" : each.value.timeouts } : {}
     content {
-      create = timeouts.value.create
-      delete = timeouts.value.delete
-      read   = timeouts.value.read
-      update = timeouts.value.update
+      create = each.value.timeouts.create
+      delete = each.value.timeouts.delete
+      read   = each.value.timeouts.read
+      update = each.value.timeouts.update
     }
   }
 }

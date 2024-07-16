@@ -94,26 +94,23 @@ EOT
 }
 
 variable "automation_certificate" {
-  type        = object({
+  type = map(object({
     name        = string
     base64      = string
-    resource_group_name = string
-    automation_account_name = string
     description = optional(string)
-    exportable  = optional(bool,false)
-    timeouts    = optional(object({
+    exportable  = optional(bool, false)
+    timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
       read   = optional(string)
       update = optional(string)
     }))
-  })
+  }))
+  default     = {}
   description = <<-EOT
   A list of Automation Certificates which should be created in this Automation Account.
     `name` - (Required) The name of the Certificate.
     `base64` - (Required) The base64 encoded value of the Certificate.
-    `resource_group_name` - (Required) The name of the resource group in which the Certificate is created.
-    `automation_account_name` - (Required) The name of the automation account in which the Certificate is created.
     `description` - (Optional) A description for this Certificate.
     `exportable` - (Optional) Whether the Certificate is exportable. Defaults to `false`.
     `timeouts` - (Optional) The timeouts block.
@@ -122,25 +119,22 @@ EOT
 }
 
 variable "automation_connection" {
-  type        = object({
+  type = map(object({
     name        = string
-    resource_group_name = string
-    automation_account_name = string
     type        = string
     values      = map(string)
     description = optional(string)
-    timeouts    = optional(object({
+    timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
       read   = optional(string)
       update = optional(string)
     }))
-  })
+  }))
+  default     = {}
   description = <<-EOT
   A list of Automation Connections which should be created in this Automation Account.
     `name` - (Required) The name of the Connection.
-    `resource_group_name` - (Required) The name of the resource group in which the Connection is created.
-    `automation_account_name` - (Required) The name of the automation account in which the Connection is created.
     `type` - (Required) The type of the Connection.
     `values` - (Required) A mapping of key value pairs passed to the connection. Different `type` needs different parameters in the `values`. Builtin types have required field values as below:
       `Azure`: parameters `AutomationCertificateName` and `SubscriptionID`.
@@ -152,4 +146,92 @@ EOT
   nullable    = false
 }
 
-
+variable "automation_runbook" {
+  type = map(object({
+    name                     = string
+    runbook_type             = string
+    log_progress              = bool
+    log_verbose              = bool
+    description              = optional(string, "test")
+    content                  = optional(string, null)
+    tags                     = optional(map(string))
+    log_activity_trace_level = optional(number, null)
+    publish_content_link = optional(object({
+      uri     = string
+      version = optional(string)
+      hash = optional(object({
+        algorithm = string
+        value     = string
+      }))
+    }))
+    draft = optional(object({
+      edit_mode_enabled = optional(bool)
+      output_types      = optional(list(string))
+      content_link = optional(object({
+        uri     = string
+        version = optional(string)
+        hash = optional(object({
+          algorithm = string
+          value     = string
+        }))
+      }))
+      parameters = optional(list(object({
+        default_value = optional(string)
+        key           = string
+        mandatory     = optional(bool)
+        position      = optional(number)
+        type          = string
+      })))
+    }))
+    job_schedule = optional(object({
+      parameters    = map(string)
+      run_on        = string
+      schedule_name = string
+    }))
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Runbooks which should be created in this Automation Account.
+    `name` - (Required) The name of the Runbook.
+    `runbook_type` - (Required) The type of the Runbook. Possible values are `PowerShell`, `PowerShellWorkflow`, `Graph`, `GraphPowerShell`, `GraphPowerShellWorkflow`, `GraphPython2`, `GraphPython3`, `GraphPowerShellCore`, `GraphPowerShellCoreWorkflow`, `GraphPowerShellCorePython2`, `GraphPowerShellCorePython3`, `GraphPowerShellCorePowerShell`, `GraphPowerShellCorePowerShellWorkflow`, `GraphPowerShellCorePowerShellPython2`, `GraphPowerShellCorePowerShellPython3`, `GraphPowerShellCorePowerShellCore`, `GraphPowerShellCorePowerShellCoreWorkflow`, `GraphPowerShellCorePowerShellCorePython2`, `GraphPowerShellCorePowerShellCorePython3`.
+    `log_process` - (Required) Whether to log process details. Defaults to `true`.
+    `log_verbose` - (Required) Whether to log verbose details. Defaults to `true`.
+    `description` - (Optional) A description for this Runbook.
+    `content` - (Optional) The content of the Runbook. Required if `publish_content_link` is not specified.
+    `tags` - (Optional) A mapping of tags to assign to the Runbook.
+    `log_activity_trace_level` - (Optional) The log activity trace level. Defaults to `null`.
+    `publish_content_link` - (Optional) The publish content link block.
+      `uri` - (Required) The URI of the content.
+      `version` - (Optional) The version of the content.
+      `hash` - (Optional) The hash block.
+        `algorithm` - (Required) The algorithm used to hash the content.
+        `value` - (Required) The value of the hash.
+    `draft` - (Optional) The draft block.
+      `edit_mode_enabled` - (Optional) Whether edit mode is enabled. Defaults to `null`.
+      `output_types` - (Optional) A list of output types.
+      `content_link` - (Optional) The content link block.
+        `uri` - (Required) The URI of the content.
+        `version` - (Optional) The version of the content.
+        `hash` - (Optional) The hash block.
+          `algorithm` - (Required) The algorithm used to hash the content.
+          `value` - (Required) The value of the hash.
+      `parameters` - (Optional) A list of parameters.
+        `default_value` - (Optional) The default value of the parameter.
+        `key` - (Required) The key of the parameter.
+        `mandatory` - (Optional) Whether the parameter is mandatory. Defaults to `null`.
+        `position` - (Optional) The position of the parameter.
+        `type` - (Required) The type of the parameter.
+    `job_schedule` - (Optional) The job schedule block.
+      `parameters` - (Required) A mapping of parameters.
+      `run_on` - (Required) The run on value.
+      `schedule_name` - (Required) The name of the schedule.
+    `timeouts` - (Optional) The timeouts block.
+EOT
+}
