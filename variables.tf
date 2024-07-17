@@ -235,3 +235,34 @@ variable "automation_runbook" {
     `timeouts` - (Optional) The timeouts block.
 EOT
 }
+
+variable "automation_webhook" {
+  type = map(object({
+    name = string
+    expiry_time = string
+    enabled = optional(bool,true)
+    runbook_name = string
+    run_on_worker_group = optional(string)
+    parameters = optional(map(string))
+    uri = optional(string,null) 
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+  }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of webhook to be created for an Automation runbook in this Automation Account.
+    `name` - (Required) Specifies the name of the Webhook. Changing this forces a new resource to be created.
+    `expiry_time` - (Required) Timestamp when the webhook expires. Changing this forces a new resource to be created.
+    `enabled` - (Optional) Controls if Webhook is enabled. Defaults to `true`.
+    `runbook_name` - (Required) Name of the Automation Runbook to execute by Webhook.
+    `run_on_worker_group` - (Optional) Name of the hybrid worker group the Webhook job will run on.
+    `parameters` - (Optional) Map of input parameters passed to runbook.
+    `uri` - (Optional) The URI of the webhook. Changing this forces a new resource to be created.
+    `timeouts` - (Optional) The timeouts block.
+EOT
+}

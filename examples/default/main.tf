@@ -46,14 +46,14 @@ module "azurerm_automation_account" {
   tags = {
     environment = "development"
   }
-  automation_certificate = {
-    auto_cert_key1 = {
-      name        = "example-certificate"
-      description = "This is an example certificate"
-      base64      = filebase64("certificate.pfx")
-      exportable  = true
-    }
-  }
+  # automation_certificate = {
+  #   auto_cert_key1 = {
+  #     name        = "example-certificate"
+  #     description = "This is an example certificate"
+  #     base64      = filebase64("certificate.pfx")
+  #     exportable  = true
+  #   }
+  # }
   automation_connection = {
     auto_conn_key1 = {
       name        = "example-connection"
@@ -80,4 +80,16 @@ module "azurerm_automation_account" {
       }
     }
   }
+  automation_webhook = {
+    auto_webhook_key1 = {
+      name         = "TestRunbook_webhook"
+      expiry_time  = "2021-12-31T00:00:00Z"
+      enabled      = true
+      runbook_name = "Get-AzureVMTutorial"
+      parameters = {
+        input = "parameter"
+      }
+    }
+  }
+
 }
