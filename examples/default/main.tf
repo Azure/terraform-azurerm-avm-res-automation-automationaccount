@@ -83,7 +83,7 @@ module "azurerm_automation_account" {
   automation_webhook = {
     auto_webhook_key1 = {
       name         = "TestRunbook_webhook"
-      expiry_time  = "2021-12-31T00:00:00Z"
+      expiry_time  = "2024-12-31T00:00:00Z"
       enabled      = true
       runbook_name = "Get-AzureVMTutorial"
       parameters = {
