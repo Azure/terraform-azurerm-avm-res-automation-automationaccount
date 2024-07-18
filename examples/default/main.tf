@@ -46,14 +46,14 @@ module "azurerm_automation_account" {
   tags = {
     environment = "development"
   }
-  automation_certificate = {
-    auto_cert_key1 = {
-      name        = "example-certificate"
-      description = "This is an example certificate"
-      base64      = filebase64("certificate.pfx")
-      exportable  = true
-    }
-  }
+  # automation_certificate = {
+  #   auto_cert_key1 = {
+  #     name        = "example-certificate"
+  #     description = "This is an example certificate"
+  #     base64      = filebase64("certificate.pfx")
+  #     exportable  = true
+  #   }
+  # }
   automation_connection = {
     auto_conn_key1 = {
       name        = "example-connection"
@@ -77,6 +77,29 @@ module "azurerm_automation_account" {
       runbook_type = "PowerShellWorkflow"
       publish_content_link = {
         uri = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/c4935ffb69246a6058eb24f54640f53f69d3ac9f/101-automation-runbook-getvms/Runbooks/Get-AzureVMTutorial.ps1"
+      }
+    }
+  }
+  automation_schedule = {
+    auto_schedule_key1 = {
+      name        = "tfex-automation-schedule"
+      description = "This is an example schedule"
+      frequency   = "Week"
+      interval    = 1
+      expiry_time = "2024-12-31T00:00:00Z"
+      timezone    = "UTC"
+      start_time  = "2024-07-19T00:00:00Z"
+      week_days   = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    }
+  }
+  automation_webhook = {
+    auto_webhook_key1 = {
+      name         = "TestRunbook_webhook"
+      expiry_time  = "2024-12-31T00:00:00Z"
+      enabled      = true
+      runbook_name = "Get-AzureVMTutorial"
+      parameters = {
+        input = "parameter"
       }
     }
   }

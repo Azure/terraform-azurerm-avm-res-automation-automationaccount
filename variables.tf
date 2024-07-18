@@ -235,3 +235,76 @@ variable "automation_runbook" {
     `timeouts` - (Optional) The timeouts block.
 EOT
 }
+
+variable "automation_webhook" {
+  type = map(object({
+    name = string
+    expiry_time = string
+    enabled = optional(bool,true)
+    runbook_name = string
+    run_on_worker_group = optional(string)
+    parameters = optional(map(string))
+    uri = optional(string,null) 
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+  }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of webhook to be created for an Automation runbook in this Automation Account.
+    `name` - (Required) Specifies the name of the Webhook. Changing this forces a new resource to be created.
+    `expiry_time` - (Required) Timestamp when the webhook expires. Changing this forces a new resource to be created.
+    `enabled` - (Optional) Controls if Webhook is enabled. Defaults to `true`.
+    `runbook_name` - (Required) Name of the Automation Runbook to execute by Webhook.
+    `run_on_worker_group` - (Optional) Name of the hybrid worker group the Webhook job will run on.
+    `parameters` - (Optional) Map of input parameters passed to runbook.
+    `uri` - (Optional) The URI of the webhook. Changing this forces a new resource to be created.
+    `timeouts` - (Optional) The timeouts block.
+EOT
+}
+
+variable "automation_schedule" {
+  type = map(object({
+    name = string
+    frequency = string
+    description = optional(string,null)
+    interval = optional(number,1)
+    start_time = optional(string)
+    expiry_time = optional(string)
+    timezone = optional(string,"UTC")
+    week_days = optional(set(string))
+    month_days = optional(set(number))
+    monthly_occurrence = optional(object({
+      day = string
+      occurence = number
+    }))
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+  }))
+  }))
+  default = {}
+  nullable = false
+  description = <<-EOT
+  A list of Automation Schedules which should be created in this Automation Account.
+    `name` - (Required) The name of the Schedule.
+    `frequency` - (Required) The frequency of the Schedule. Possible values are `OneTime`, `Hour`, `Day`, `Week` or `Month`.
+    `description` - (Optional) A description for this Schedule.
+    `interval` - (Optional) The number of `frequencys` between runs. Only valid when frequency is `Day`, `Hour`, `Week`, or `Month` and defaults to `1`.
+    `start_time` - (Optional) The start time of the Schedule. Must be at least five minutes in the future. Defaults to seven minutes in the future from the time the resource is created.
+    `expiry_time` - (Optional) The expiry time of the Schedule.
+    `timezone` - (Optional) The timezone of the Schedule. Defaults to `UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
+    `week_days` - (Optional) List of days of the week that the job should execute on. Only valid when frequency is `Week`. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday` and `Sunday`.
+    `month_days` - (Optional) List of days of the month that the job should execute on. Must be between `1` and `31`. `-1` for last day of the month. Only valid when frequency is `Month`.
+    `monthly_occurrence` - (Optional) One monthly_occurrence blocks as defined below to specifies occurrences of days within a month. Only valid when frequency is `Month`.
+      `day` - (Required) The day of the month.
+      `occurrence` - (Required) The occurrence of the day in the month.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
