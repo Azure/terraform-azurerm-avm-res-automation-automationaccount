@@ -80,6 +80,18 @@ module "azurerm_automation_account" {
       }
     }
   }
+  automation_schedule = {
+    auto_schedule_key1 = {
+      name        = "tfex-automation-schedule"
+      description = "This is an example schedule"
+      frequency   = "Week"
+      interval    = 1
+      expiry_time = "2024-12-31T00:00:00Z"
+      timezone    = "UTC"
+      start_time  = "2024-07-19T00:00:00Z"
+      week_days   = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    }
+  }
   automation_webhook = {
     auto_webhook_key1 = {
       name         = "TestRunbook_webhook"
@@ -91,5 +103,4 @@ module "azurerm_automation_account" {
       }
     }
   }
-
 }

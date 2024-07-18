@@ -266,3 +266,45 @@ variable "automation_webhook" {
     `timeouts` - (Optional) The timeouts block.
 EOT
 }
+
+variable "automation_schedule" {
+  type = map(object({
+    name = string
+    frequency = string
+    description = optional(string,null)
+    interval = optional(number,1)
+    start_time = optional(string)
+    expiry_time = optional(string)
+    timezone = optional(string,"UTC")
+    week_days = optional(set(string))
+    month_days = optional(set(number))
+    monthly_occurrence = optional(object({
+      day = string
+      occurence = number
+    }))
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+  }))
+  }))
+  default = {}
+  nullable = false
+  description = <<-EOT
+  A list of Automation Schedules which should be created in this Automation Account.
+    `name` - (Required) The name of the Schedule.
+    `frequency` - (Required) The frequency of the Schedule. Possible values are `OneTime`, `Hour`, `Day`, `Week` or `Month`.
+    `description` - (Optional) A description for this Schedule.
+    `interval` - (Optional) The number of `frequencys` between runs. Only valid when frequency is `Day`, `Hour`, `Week`, or `Month` and defaults to `1`.
+    `start_time` - (Optional) The start time of the Schedule. Must be at least five minutes in the future. Defaults to seven minutes in the future from the time the resource is created.
+    `expiry_time` - (Optional) The expiry time of the Schedule.
+    `timezone` - (Optional) The timezone of the Schedule. Defaults to `UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
+    `week_days` - (Optional) List of days of the week that the job should execute on. Only valid when frequency is `Week`. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday` and `Sunday`.
+    `month_days` - (Optional) List of days of the month that the job should execute on. Must be between `1` and `31`. `-1` for last day of the month. Only valid when frequency is `Month`.
+    `monthly_occurrence` - (Optional) One monthly_occurrence blocks as defined below to specifies occurrences of days within a month. Only valid when frequency is `Month`.
+      `day` - (Required) The day of the month.
+      `occurrence` - (Required) The occurrence of the day in the month.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
