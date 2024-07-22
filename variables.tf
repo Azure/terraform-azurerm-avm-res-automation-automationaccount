@@ -146,6 +146,54 @@ EOT
   nullable    = false
 }
 
+variable "automation_connection_certificate" {
+  type = map(object({
+    subscription_id             = string
+    automation_certificate_name = string
+  }))
+  default     = {}
+  description = <<-EOT
+  A list of Automation Connection Certificates which should be created in this Automation Account.
+    `subscription_id` - (Required) The Subscription ID to use for this Connection Certificate.
+    `automation_certificate_name` - (Required) The name of the Automation Certificate to use for this Connection Certificate.
+  EOT
+  nullable    = false
+}  
+
+variable "automation_connection_service_principal" {
+  type = map(object({
+    tenant_id            = string
+    application_id       = string
+    certificate_thumbprint = string
+    subscription_id       = string
+  }))
+  default     = {}
+  description = <<-EOT
+  A list of Automation Connection Service Principals which should be created in this Automation Account.
+    `tenant_id` - (Required) The Tenant ID to use for this Connection Service Principal.
+    `application_id` - (Required) The Application ID to use for this Connection Service Principal.
+    `certificate_thumbprint` - (Required) The Certificate Thumbprint to use for this Connection Service Principal.
+    `subscription_id` - (Required) The Subscription ID to use for this Connection Service Principal.
+  EOT
+  nullable    = false
+}
+
+variable "automation_connection_classic_certificate" {
+  type = map(object({
+    subscription_id      = string
+    subscription_name    = string
+    certificate_asset_name   = string
+  }))
+  default     = {}
+  description = <<-EOT
+  A list of Automation Connection Classic Certificates which should be created in this Automation Account.
+    `subscription_id` - (Required) The Subscription ID to use for this Connection Classic Certificate.
+    `subscription_name` - (Required) The Subscription Name to use for this Connection Classic Certificate.
+    `certificate_asset_name` - (Required) The name of the certificate asset to use for this Connection Classic Certificate.
+  EOT
+  nullable    = false
+}
+
 variable "automation_runbook" {
   type = map(object({
     name                     = string

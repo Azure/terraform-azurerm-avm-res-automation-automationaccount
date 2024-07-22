@@ -67,6 +67,12 @@ module "azurerm_automation_account" {
       }
     }
   }
+  automation_connection_certificate = {
+    auto_conn_cert_key1 = {
+      automation_certificate_name = "example-certificate"
+      subscription_id = data.azurerm_client_config.example.subscription_id
+    }
+  }
   automation_runbook = {
     auto_runbook_key1 = {
       name         = "Get-AzureVMTutorial"
