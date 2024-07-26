@@ -46,6 +46,15 @@ module "azurerm_automation_account" {
   tags = {
     environment = "development"
   }
+
+  automation_credential = {
+    auto_cred_key1 = {
+      name        = "example-credential"
+      description = "This is an example credential"
+      username    = "admin"
+      password    = "example_pwd"
+    }
+  }
   # automation_certificate = {
   #   auto_cert_key1 = {
   #     name        = "example-certificate"
@@ -67,12 +76,12 @@ module "azurerm_automation_account" {
       }
     }
   }
-  automation_connection_certificate = {
-    auto_conn_cert_key1 = {
-      automation_certificate_name = "example-certificate"
-      subscription_id = data.azurerm_client_config.example.subscription_id
-    }
-  }
+  # automation_connection_certificate = {
+  #   auto_conn_cert_key1 = {
+  #     automation_certificate_name = "example-certificate"
+  #     subscription_id = data.azurerm_client_config.example.subscription_id
+  #   }
+  # }
   automation_runbook = {
     auto_runbook_key1 = {
       name         = "Get-AzureVMTutorial"
@@ -94,7 +103,7 @@ module "azurerm_automation_account" {
       interval    = 1
       expiry_time = "2024-12-31T00:00:00Z"
       timezone    = "UTC"
-      start_time  = "2024-07-19T00:00:00Z"
+      start_time  = "2024-07-27T00:00:00Z"
       week_days   = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     }
   }

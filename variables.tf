@@ -194,6 +194,31 @@ variable "automation_connection_classic_certificate" {
   nullable    = false
 }
 
+variable "automation_credential" {
+  type = map(object({
+    name        = string
+    username    = string
+    password    = string
+    description = optional(string)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable = false
+  description = <<-EOT
+  A list of Automation Credentials which should be created in this Automation Account.
+    `name` - (Required) The name of the Credential.
+    `username` - (Required) The username associated with this Automation Credential.
+    `password` - (Required) The password associated with this Automation Credential.
+    `description` - (Optional) A description associated with this Automation Credential.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
 variable "automation_runbook" {
   type = map(object({
     name                     = string
@@ -356,3 +381,4 @@ variable "automation_schedule" {
     `timeouts` - (Optional) The timeouts block.
   EOT
 }
+
