@@ -1,5 +1,5 @@
 resource "azurerm_automation_connection" "this" {
-  for_each                = var.automation_connection != null ? var.automation_connection : {}
+  for_each                = var.automation_connections != null ? var.automation_connections : {}
   automation_account_name = azurerm_automation_account.this.name
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
@@ -19,7 +19,7 @@ resource "azurerm_automation_connection" "this" {
 }
 
 resource "azurerm_automation_connection_certificate" "this" {
-  for_each                = var.automation_connection_certificate != null ? var.automation_connection_certificate : {}
+  for_each                = var.automation_connection_certificates != null ? var.automation_connection_certificates : {}
     automation_account_name = azurerm_automation_account.this.name
     name                    = azurerm_automation_connection.this[each.value.automation_connection_name].name
     resource_group_name     = azurerm_automation_account.this.resource_group_name
@@ -29,7 +29,7 @@ resource "azurerm_automation_connection_certificate" "this" {
 }
 
 resource "azurerm_automation_connection_service_principal" "this" {
-  for_each                = var.automation_connection_service_principal != null ? var.automation_connection_service_principal : {}
+  for_each                = var.automation_connection_service_principals != null ? var.automation_connection_service_principals : {}
     automation_account_name = azurerm_automation_account.this.name
     name                    = azurerm_automation_connection.this[each.value.automation_connection_name].name
     resource_group_name     = azurerm_automation_account.this.resource_group_name
@@ -40,7 +40,7 @@ resource "azurerm_automation_connection_service_principal" "this" {
 }
 
 resource "azurerm_automation_connection_classic_certificate" "this" {
-  for_each                = var.automation_connection_classic_certificate != null ? var.automation_connection_classic_certificate : {}
+  for_each                = var.automation_connection_classic_certificates != null ? var.automation_connection_classic_certificates : {}
     automation_account_name = azurerm_automation_account.this.name
     name                    = azurerm_automation_connection.this[each.value.automation_connection_name].name
     resource_group_name     = azurerm_automation_account.this.resource_group_name

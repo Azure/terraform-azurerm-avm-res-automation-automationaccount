@@ -1,5 +1,5 @@
 resource "azurerm_automation_runbook" "this" {
-  for_each                 = var.automation_runbook != null ? var.automation_runbook : {}
+  for_each                 = var.automation_runbooks != null ? var.automation_runbooks : {}
   automation_account_name  = azurerm_automation_account.this.name
   location                 = azurerm_automation_account.this.location
   log_progress             = each.value.log_progress
@@ -45,10 +45,10 @@ resource "azurerm_automation_runbook" "this" {
       }
     }
   }
+  // Need to understand how Job_schedule needs to be configured.
   dynamic "job_schedule" {
     for_each = each.value.job_schedule == null ? [] : [each.value.job_schedule]
     content {
-      job_schedule_id = job_schedule.value.job_schedule_id
       parameters      = job_schedule.value.parameters
       run_on          = job_schedule.value.run_on
       schedule_name   = job_schedule.value.schedule_name

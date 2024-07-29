@@ -47,42 +47,7 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 
-  automation_credentials = {
-    auto_cred_key1 = {
-      name        = "example-credential"
-      description = "This is an example credential"
-      username    = "admin"
-      password    = "example_pwd"
-    }
-  }
-  # automation_certificates = {
-  #   auto_cert_key1 = {
-  #     name        = "example-certificate"
-  #     description = "This is an example certificate"
-  #     base64      = filebase64("certificate.pfx")
-  #     exportable  = true
-  #   }
-  # }
-  automation_connections = {
-    auto_conn_key1 = {
-      name        = "example-connection"
-      description = "This is an example connection"
-      type        = "AzureServicePrincipal"
-      values = {
-        "ApplicationId" : "3ff01f1c-3fd0-4875-bb11-b3beb05fe07e", #"00000000-0000-0000-0000-000000000000",
-        "TenantId" : data.azurerm_client_config.example.tenant_id,
-        "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
-        "CertificateThumbprint" : "sample-certificate-thumbprint",
-      }
-    }
-  }
-  # automation_connection_certificates = {
-  #   auto_conn_cert_key1 = {
-  #     automation_certificate_name = "example-certificate"
-  #     subscription_id = data.azurerm_client_config.example.subscription_id
-  #   }
-  # }
-  automation_runbooks = {
+automation_runbooks = {
     auto_runbook_key1 = {
       name         = "Get-AzureVMTutorial"
       description  = "This is an example runbook"
@@ -95,18 +60,7 @@ module "azurerm_automation_account" {
       }
     }
   }
-  automation_schedules = {
-    auto_schedule_key1 = {
-      name        = "tfex-automation-schedule"
-      description = "This is an example schedule"
-      frequency   = "Week"
-      interval    = 1
-      expiry_time = "2024-12-31T00:00:00Z"
-      timezone    = "UTC"
-      start_time  = "2024-07-27T00:00:00Z"
-      week_days   = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-    }
-  }
+
   automation_webhooks = {
     auto_webhook_key1 = {
       name         = "TestRunbook_webhook"

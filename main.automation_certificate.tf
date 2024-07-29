@@ -1,5 +1,5 @@
 resource "azurerm_automation_certificate" "this" {
-  for_each                = var.automation_certificate != null ? var.automation_certificate : {}
+  for_each                = var.automation_certificates != null ? var.automation_certificates : {}
   automation_account_name = azurerm_automation_account.this.name
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
