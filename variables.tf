@@ -93,7 +93,7 @@ variable "timeouts" {
 EOT
 }
 
-variable "automation_certificate" {
+variable "automation_certificates" {
   type = map(object({
     name        = string
     base64      = string
@@ -118,7 +118,7 @@ EOT
   nullable    = false
 }
 
-variable "automation_connection" {
+variable "automation_connections" {
   type = map(object({
     name        = string
     type        = string
@@ -146,7 +146,7 @@ EOT
   nullable    = false
 }
 
-variable "automation_connection_certificate" {
+variable "automation_connection_certificates" {
   type = map(object({
     subscription_id             = string
     automation_certificate_name = string
@@ -160,7 +160,7 @@ variable "automation_connection_certificate" {
   nullable    = false
 }  
 
-variable "automation_connection_service_principal" {
+variable "automation_connection_service_principals" {
   type = map(object({
     tenant_id            = string
     application_id       = string
@@ -178,7 +178,7 @@ variable "automation_connection_service_principal" {
   nullable    = false
 }
 
-variable "automation_connection_classic_certificate" {
+variable "automation_connection_classic_certificates" {
   type = map(object({
     subscription_id      = string
     subscription_name    = string
@@ -194,7 +194,7 @@ variable "automation_connection_classic_certificate" {
   nullable    = false
 }
 
-variable "automation_credential" {
+variable "automation_credentials" {
   type = map(object({
     name        = string
     username    = string
@@ -219,7 +219,140 @@ variable "automation_credential" {
   EOT
 }
 
-variable "automation_runbook" {
+variable "automation_schedules" {
+  type = map(object({
+    name = string
+    frequency = string
+    description = optional(string,null)
+    interval = optional(number,1)
+    start_time = optional(string)
+    expiry_time = optional(string)
+    timezone = optional(string,"UTC")
+    week_days = optional(set(string))
+    month_days = optional(set(number))
+    monthly_occurrence = optional(object({
+      day = string
+      occurence = number
+    }))
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+  }))
+  }))
+  default = {}
+  nullable = false
+  description = <<-EOT
+  A list of Automation Schedules which should be created in this Automation Account.
+    `name` - (Required) The name of the Schedule.
+    `frequency` - (Required) The frequency of the Schedule. Possible values are `OneTime`, `Hour`, `Day`, `Week` or `Month`.
+    `description` - (Optional) A description for this Schedule.
+    `interval` - (Optional) The number of `frequencys` between runs. Only valid when frequency is `Day`, `Hour`, `Week`, or `Month` and defaults to `1`.
+    `start_time` - (Optional) The start time of the Schedule. Must be at least five minutes in the future. Defaults to seven minutes in the future from the time the resource is created.
+    `expiry_time` - (Optional) The expiry time of the Schedule.
+    `timezone` - (Optional) The timezone of the Schedule. Defaults to `UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
+    `week_days` - (Optional) List of days of the week that the job should execute on. Only valid when frequency is `Week`. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday` and `Sunday`.
+    `month_days` - (Optional) List of days of the month that the job should execute on. Must be between `1` and `31`. `-1` for last day of the month. Only valid when frequency is `Month`.
+    `monthly_occurrence` - (Optional) One monthly_occurrence blocks as defined below to specifies occurrences of days within a month. Only valid when frequency is `Month`.
+      `day` - (Required) The day of the month.
+      `occurrence` - (Required) The occurrence of the day in the month.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
+variable "automation_modules" {
+  type = map(object({
+    name        = string
+    module_link = object({
+      uri = string
+      hash = optional(object({
+        algorithm = string
+        value     = string
+      }))
+    })
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Modules which should be created in this Automation Account.
+    `name` - (Required) The name of the Module.
+    `module_link` - (Required) The content link block.
+      `uri` - (Required) The URI of the content.
+      `hash` - (Optional) The hash block.
+        `algorithm` - (Required) The algorithm used to hash the content.
+        `value` - (Required) The value of the hash.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
+variable "automation_powershell72_modules" {
+  type = map(object({
+    name        = string
+    module_link = object({
+      uri = string
+      hash = optional(object({
+        algorithm = string
+        value     = string
+      }))
+    })
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Powershell 7.2 Modules which should be created in this Automation Account.
+    `name` - (Required) The name of the Module.
+    `module_link` - (Required) The content link block.
+      `uri` - (Required) The URI of the content.
+      `hash` - (Optional) The hash block.
+        `algorithm` - (Required) The algorithm used to hash the content.
+        `value` - (Required) The value of the hash.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
+variable "automation_python3_packages" {
+  type = map(object({
+    name        = string
+    content_uri = string
+    content_version = optional(string) // format should be like 1.1.1
+    hash_algorithm = optional(string)
+    hash_value = optional(string)
+    tags = optional(map(string))
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Python 3 packages which should be created in this Automation Account.
+    `name` - (Required) The name of the Module.
+    `content_uri` - (Required) The URI of the content. Changing this forces a new Automation Python3 Package to be created.
+    `content_version` - (Optional) The version of the content.  The value should meet the system.version class format like `1.1.1`. Changing this forces a new Automation Python3 Package to be created.
+    `hash_algorithm` - (Optional) Specify the hash algorithm used to hash the content of the python3 package. Changing this forces a new Automation Python3 Package to be created.
+    `hash_value` - (Optional) Specity the hash value of the content. Changing this forces a new Automation Python3 Package to be created.
+    `tags` - (Optional) A mapping of tags to assign to the Module.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
+variable "automation_runbooks" {
   type = map(object({
     name                     = string
     runbook_type             = string
@@ -309,7 +442,7 @@ variable "automation_runbook" {
 EOT
 }
 
-variable "automation_webhook" {
+variable "automation_webhooks" {
   type = map(object({
     name = string
     expiry_time = string
@@ -340,45 +473,5 @@ variable "automation_webhook" {
 EOT
 }
 
-variable "automation_schedule" {
-  type = map(object({
-    name = string
-    frequency = string
-    description = optional(string,null)
-    interval = optional(number,1)
-    start_time = optional(string)
-    expiry_time = optional(string)
-    timezone = optional(string,"UTC")
-    week_days = optional(set(string))
-    month_days = optional(set(number))
-    monthly_occurrence = optional(object({
-      day = string
-      occurence = number
-    }))
-    timeouts = optional(object({
-      create = optional(string)
-      delete = optional(string)
-      read   = optional(string)
-      update = optional(string)
-  }))
-  }))
-  default = {}
-  nullable = false
-  description = <<-EOT
-  A list of Automation Schedules which should be created in this Automation Account.
-    `name` - (Required) The name of the Schedule.
-    `frequency` - (Required) The frequency of the Schedule. Possible values are `OneTime`, `Hour`, `Day`, `Week` or `Month`.
-    `description` - (Optional) A description for this Schedule.
-    `interval` - (Optional) The number of `frequencys` between runs. Only valid when frequency is `Day`, `Hour`, `Week`, or `Month` and defaults to `1`.
-    `start_time` - (Optional) The start time of the Schedule. Must be at least five minutes in the future. Defaults to seven minutes in the future from the time the resource is created.
-    `expiry_time` - (Optional) The expiry time of the Schedule.
-    `timezone` - (Optional) The timezone of the Schedule. Defaults to `UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
-    `week_days` - (Optional) List of days of the week that the job should execute on. Only valid when frequency is `Week`. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday` and `Sunday`.
-    `month_days` - (Optional) List of days of the month that the job should execute on. Must be between `1` and `31`. `-1` for last day of the month. Only valid when frequency is `Month`.
-    `monthly_occurrence` - (Optional) One monthly_occurrence blocks as defined below to specifies occurrences of days within a month. Only valid when frequency is `Month`.
-      `day` - (Required) The day of the month.
-      `occurrence` - (Required) The occurrence of the day in the month.
-    `timeouts` - (Optional) The timeouts block.
-  EOT
-}
+
 

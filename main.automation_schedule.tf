@@ -1,5 +1,5 @@
 resource "azurerm_automation_schedule" "this" {
-for_each = var.automation_schedule != null ? var.automation_schedule : {}
+for_each = var.automation_schedules != null ? var.automation_schedules : {}
   automation_account_name = azurerm_automation_account.this.name
   frequency               = each.value.frequency
   name                    = each.value.name

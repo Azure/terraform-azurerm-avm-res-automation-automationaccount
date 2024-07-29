@@ -1,5 +1,5 @@
 resource "azurerm_automation_runbook" "this" {
-  for_each                 = var.automation_runbook != null ? var.automation_runbook : {}
+  for_each                 = var.automation_runbooks != null ? var.automation_runbooks : {}
   automation_account_name  = azurerm_automation_account.this.name
   location                 = azurerm_automation_account.this.location
   log_progress             = each.value.log_progress

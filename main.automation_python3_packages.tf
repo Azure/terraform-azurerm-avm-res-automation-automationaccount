@@ -1,14 +1,13 @@
-resource "azurerm_automation_webhook" "this" {
-for_each = var.automation_webhooks != null ? var.automation_webhooks : {}
+resource "azurerm_automation_python3_package" "this" {
+for_each = var.automation_python3_packages != null ? var.automation_python3_packages : {}
   automation_account_name = azurerm_automation_account.this.name
-  expiry_time             = each.value.expiry_time
+  content_uri             = each.value.content_uri
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
-  runbook_name           =  each.value.runbook_name
-  enabled                 = each.value.enabled
-  parameters              = each.value.parameters
-  run_on_worker_group     = each.value.run_on_worker_group
-  uri                     = each.value.uri
+  content_version         = each.value.content_version
+  hash_algorithm          = each.value.hash_algorithm
+  hash_value              = each.value.hash_value
+  tags                    = each.value.tags
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -20,4 +19,3 @@ for_each = var.automation_webhooks != null ? var.automation_webhooks : {}
     }
   }
 }
-
