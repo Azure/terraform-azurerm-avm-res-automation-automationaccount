@@ -352,6 +352,131 @@ variable "automation_python3_packages" {
   EOT
 }
 
+variable "automation_variable_bools" {
+  type = map(object({
+    name        = string
+    value       = optional(bool, true)
+    description = optional(string)
+    encrypted   = optional(bool, false)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Variables of type `Bool` which should be created in this Automation Account.
+    `name` - (Required) The name of the Variable.
+    `value` - (Optional) The value of the Variable. Defaults to `true`.
+    `description` - (Optional) A description for this Variable.
+    `encrypted` - (Optional) Whether the Variable is encrypted. Defaults to `false`.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
+variable "automation_variable_datetimes" {
+  type = map(object({
+    name        = string
+    value       = optional(string)
+    description = optional(string)
+    encrypted   = optional(bool, false)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Variables of type `DateTime` which should be created in this Automation Account.
+    `name` - (Required) The name of the Variable.
+    `value` - (Optional) The value of the Variable.
+    `description` - (Optional) A description for this Variable.
+    `encrypted` - (Optional) Whether the Variable is encrypted. Defaults to `false`.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
+variable "automation_variable_ints" {
+  type = map(object({
+    name        = string
+    value       = optional(number)
+    description = optional(string)
+    encrypted   = optional(bool, false)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Variables of type `Int` which should be created in this Automation Account.
+    `name` - (Required) The name of the Variable.
+    `value` - (Optional) The value of the Variable.
+    `description` - (Optional) A description for this Variable.
+    `encrypted` - (Optional) Whether the Variable is encrypted. Defaults to `false`.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
+variable "automation_variable_objects" {
+  type = map(object({
+    name        = string
+    value       = optional(string)
+    description = optional(string)
+    encrypted   = optional(bool, false)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Variables of type `Object` which should be created in this Automation Account.
+    `name` - (Required) The name of the Variable.
+    `value` - (Optional) The value of the Variable.
+    `description` - (Optional) A description for this Variable.
+    `encrypted` - (Optional) Whether the Variable is encrypted. Defaults to `false`.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
+variable "automation_variable_strings" {
+  type = map(object({
+    name        = string
+    value       = optional(string)
+    description = optional(string)
+    encrypted   = optional(bool, false)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Variables of type `String` which should be created in this Automation Account.
+    `name` - (Required) The name of the Variable.
+    `value` - (Optional) The value of the Variable.
+    `description` - (Optional) A description for this Variable.
+    `encrypted` - (Optional) Whether the Variable is encrypted. Defaults to `false`.
+    `timeouts` - (Optional) The timeouts block.
+  EOT
+}
+
 variable "automation_runbooks" {
   type = map(object({
     name                     = string
@@ -390,8 +515,8 @@ variable "automation_runbooks" {
       })))
     }))
     job_schedule = optional(object({
-      parameters    = map(string)
-      run_on        = string
+      parameters    = optional(map(string))
+      run_on        = optional(string)
       schedule_name = string
     }))
     timeouts = optional(object({
