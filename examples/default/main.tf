@@ -76,46 +76,13 @@ module "azurerm_automation_account" {
       }
     }
   }
+  // Need to understand the purpose of below
   # automation_connection_certificates = {
   #   auto_conn_cert_key1 = {
+  #     connection_key = "auto_conn_key1"
   #     automation_certificate_name = "example-certificate"
   #     subscription_id = data.azurerm_client_config.example.subscription_id
   #   }
   # }
-  automation_runbooks = {
-    auto_runbook_key1 = {
-      name         = "Get-AzureVMTutorial"
-      description  = "This is an example runbook"
-      script_path  = "runbook.ps1"
-      log_verbose  = "true"
-      log_progress = "true"
-      runbook_type = "PowerShellWorkflow"
-      publish_content_link = {
-        uri = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/c4935ffb69246a6058eb24f54640f53f69d3ac9f/101-automation-runbook-getvms/Runbooks/Get-AzureVMTutorial.ps1"
-      }
-    }
-  }
-  automation_schedules = {
-    auto_schedule_key1 = {
-      name        = "tfex-automation-schedule"
-      description = "This is an example schedule"
-      frequency   = "Week"
-      interval    = 1
-      expiry_time = "2024-12-31T00:00:00Z"
-      timezone    = "UTC"
-      start_time  = "2024-07-27T00:00:00Z"
-      week_days   = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-    }
-  }
-  automation_webhooks = {
-    auto_webhook_key1 = {
-      name         = "TestRunbook_webhook"
-      expiry_time  = "2024-12-31T00:00:00Z"
-      enabled      = true
-      runbook_name = "Get-AzureVMTutorial"
-      parameters = {
-        input = "parameter"
-      }
-    }
-  }
+  
 }
