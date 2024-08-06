@@ -148,12 +148,14 @@ EOT
 
 variable "automation_connection_certificates" {
   type = map(object({
+    connection_key              = string
     subscription_id             = string
     automation_certificate_name = string
   }))
   default     = {}
   description = <<-EOT
   A list of Automation Connection Certificates which should be created in this Automation Account.
+    `connection_key` - (Required) The key of the Connection to use for this Connection Certificate.
     `subscription_id` - (Required) The Subscription ID to use for this Connection Certificate.
     `automation_certificate_name` - (Required) The name of the Automation Certificate to use for this Connection Certificate.
   EOT
@@ -162,6 +164,7 @@ variable "automation_connection_certificates" {
 
 variable "automation_connection_service_principals" {
   type = map(object({
+    connection_key       = string
     tenant_id            = string
     application_id       = string
     certificate_thumbprint = string
@@ -170,6 +173,7 @@ variable "automation_connection_service_principals" {
   default     = {}
   description = <<-EOT
   A list of Automation Connection Service Principals which should be created in this Automation Account.
+    `connection_key` - (Required) The key of the Connection to use for this Connection Service Principal.
     `tenant_id` - (Required) The Tenant ID to use for this Connection Service Principal.
     `application_id` - (Required) The Application ID to use for this Connection Service Principal.
     `certificate_thumbprint` - (Required) The Certificate Thumbprint to use for this Connection Service Principal.
@@ -180,6 +184,7 @@ variable "automation_connection_service_principals" {
 
 variable "automation_connection_classic_certificates" {
   type = map(object({
+    connection_key       = string
     subscription_id      = string
     subscription_name    = string
     certificate_asset_name   = string
@@ -187,6 +192,7 @@ variable "automation_connection_classic_certificates" {
   default     = {}
   description = <<-EOT
   A list of Automation Connection Classic Certificates which should be created in this Automation Account.
+    `connection_key` - (Required) The key of the Connection to use for this Connection Classic Certificate.
     `subscription_id` - (Required) The Subscription ID to use for this Connection Classic Certificate.
     `subscription_name` - (Required) The Subscription Name to use for this Connection Classic Certificate.
     `certificate_asset_name` - (Required) The name of the certificate asset to use for this Connection Classic Certificate.
@@ -598,5 +604,46 @@ variable "automation_webhooks" {
 EOT
 }
 
+variable "automation_hybrid_runbook_worker_groups" {
+  type = map(object({
+    name = string
+    credential_name = optional(string,null)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Hybrid Runbook Worker Groups which should be created in this Automation Account.
+    `name` - (Required) The name of the Hybrid Runbook Worker Group.
+    `credential_name` - (Optional) The name of resource type azurerm_automation_credential to use for hybrid worker.
+    `timeouts` - (Optional) The timeouts block.
+EOT
+}
+
+variable "automation_hybrid_runbook_workers" {
+  type = map(object({
+    hybrid_worker_group_key = string
+    vm_resource_id = string
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default = {}
+  nullable = false
+  description = <<-EOT
+  A list of Hybrid Runbook Workers which should be created in this Automation Account.
+    `Hybrid_worker_group_key` - (Required) The key of the Hybrid Runbook Worker Group to which this Hybrid Runbook Worker belongs.
+    `vm_resource_id` - (Required) The Resource ID of the Virtual Machine to use as a Hybrid Runbook Worker.
+    `timeouts` - (Optional) The timeouts block.
+EOT
+}
 
 
