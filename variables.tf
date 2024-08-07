@@ -160,15 +160,15 @@ variable "automation_connection_certificates" {
     `automation_certificate_name` - (Required) The name of the Automation Certificate to use for this Connection Certificate.
   EOT
   nullable    = false
-}  
+}
 
 variable "automation_connection_service_principals" {
   type = map(object({
-    connection_key       = string
-    tenant_id            = string
-    application_id       = string
+    connection_key         = string
+    tenant_id              = string
+    application_id         = string
     certificate_thumbprint = string
-    subscription_id       = string
+    subscription_id        = string
   }))
   default     = {}
   description = <<-EOT
@@ -184,10 +184,10 @@ variable "automation_connection_service_principals" {
 
 variable "automation_connection_classic_certificates" {
   type = map(object({
-    connection_key       = string
-    subscription_id      = string
-    subscription_name    = string
-    certificate_asset_name   = string
+    connection_key         = string
+    subscription_id        = string
+    subscription_name      = string
+    certificate_asset_name = string
   }))
   default     = {}
   description = <<-EOT
@@ -214,7 +214,7 @@ variable "automation_credentials" {
     }))
   }))
   default     = {}
-  nullable = false
+  nullable    = false
   description = <<-EOT
   A list of Automation Credentials which should be created in this Automation Account.
     `name` - (Required) The name of the Credential.
@@ -227,17 +227,17 @@ variable "automation_credentials" {
 
 variable "automation_schedules" {
   type = map(object({
-    name = string
-    frequency = string
-    description = optional(string,null)
-    interval = optional(number,1)
-    start_time = optional(string)
+    name        = string
+    frequency   = string
+    description = optional(string, null)
+    interval    = optional(number, 1)
+    start_time  = optional(string)
     expiry_time = optional(string)
-    timezone = optional(string,"UTC")
-    week_days = optional(set(string))
-    month_days = optional(set(number))
+    timezone    = optional(string, "UTC")
+    week_days   = optional(set(string))
+    month_days  = optional(set(number))
     monthly_occurrence = optional(object({
-      day = string
+      day       = string
       occurence = number
     }))
     timeouts = optional(object({
@@ -245,10 +245,10 @@ variable "automation_schedules" {
       delete = optional(string)
       read   = optional(string)
       update = optional(string)
+    }))
   }))
-  }))
-  default = {}
-  nullable = false
+  default     = {}
+  nullable    = false
   description = <<-EOT
   A list of Automation Schedules which should be created in this Automation Account.
     `name` - (Required) The name of the Schedule.
@@ -269,7 +269,7 @@ variable "automation_schedules" {
 
 variable "automation_modules" {
   type = map(object({
-    name        = string
+    name = string
     module_link = object({
       uri = string
       hash = optional(object({
@@ -300,7 +300,7 @@ variable "automation_modules" {
 
 variable "automation_powershell72_modules" {
   type = map(object({
-    name        = string
+    name = string
     module_link = object({
       uri = string
       hash = optional(object({
@@ -331,12 +331,12 @@ variable "automation_powershell72_modules" {
 
 variable "automation_python3_packages" {
   type = map(object({
-    name        = string
-    content_uri = string
+    name            = string
+    content_uri     = string
     content_version = optional(string) // format should be like 1.1.1
-    hash_algorithm = optional(string)
-    hash_value = optional(string)
-    tags = optional(map(string))
+    hash_algorithm  = optional(string)
+    hash_value      = optional(string)
+    tags            = optional(map(string))
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -487,7 +487,7 @@ variable "automation_runbooks" {
   type = map(object({
     name                     = string
     runbook_type             = string
-    log_progress              = bool
+    log_progress             = bool
     log_verbose              = bool
     description              = optional(string, "test")
     content                  = optional(string, null)
@@ -575,19 +575,19 @@ EOT
 
 variable "automation_webhooks" {
   type = map(object({
-    name = string
-    expiry_time = string
-    enabled = optional(bool,true)
-    runbook_name = string
+    name                = string
+    expiry_time         = string
+    enabled             = optional(bool, true)
+    runbook_name        = string
     run_on_worker_group = optional(string)
-    parameters = optional(map(string))
-    uri = optional(string,null) 
+    parameters          = optional(map(string))
+    uri                 = optional(string, null)
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
       read   = optional(string)
       update = optional(string)
-  }))
+    }))
   }))
   default     = {}
   nullable    = false
@@ -606,8 +606,8 @@ EOT
 
 variable "automation_hybrid_runbook_worker_groups" {
   type = map(object({
-    name = string
-    credential_name = optional(string,null)
+    name            = string
+    credential_name = optional(string, null)
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -628,7 +628,7 @@ EOT
 variable "automation_hybrid_runbook_workers" {
   type = map(object({
     hybrid_worker_group_key = string
-    vm_resource_id = string
+    vm_resource_id          = string
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -636,8 +636,8 @@ variable "automation_hybrid_runbook_workers" {
       update = optional(string)
     }))
   }))
-  default = {}
-  nullable = false
+  default     = {}
+  nullable    = false
   description = <<-EOT
   A list of Hybrid Runbook Workers which should be created in this Automation Account.
     `Hybrid_worker_group_key` - (Required) The key of the Hybrid Runbook Worker Group to which this Hybrid Runbook Worker belongs.
@@ -646,4 +646,77 @@ variable "automation_hybrid_runbook_workers" {
 EOT
 }
 
+variable "automation_watchers" {
+  type = map(object({
+    name                           = string
+    runbook_key                    = string
+    hybrid_worker_group_key        = string
+    execution_frequency_in_seconds = number
+    etag                           = optional(string)
+    script_parameters              = optional(map(string))
+    tags                           = optional(map(string))
+    description                    = optional(string)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+  A list of Automation Watchers which should be created in this Automation Account.
+    `name` - (Required) The name of the Watcher.
+    `runbook_key` - (Required) The key of the Runbook to use for this Watcher.
+    `hybrid_worker_group_key` - (Required) The key of the Hybrid Worker Group to use for this Watcher. Use `Azure` if you dont want to use hybrid worker
+    `execution_frequency_in_seconds` - (Required) The frequency in seconds at which the Watcher should run.
+    `etag` - (Optional) A string of etag assigned to this Automation Watcher.
+    `script_parameters` - (Optional) Specifies a list of key-vaule parameters. Changing this forces a new Automation watcher to be created.
+    `tags` - (Optional) A mapping of tags to assign to the Watcher.
+    `description` - (Optional) A description for this Watcher.
+    `timeouts` - (Optional) The timeouts block.
+EOT
+}
 
+variable "automation_source_controls" {
+  type = map(object({
+    name                    = string
+    folder_path             = string
+    repository_url          = string
+    source_control_type     = string // GitHub, VsoGit and VsoTfvc
+    automatic_sync          = optional(bool, false)
+    branch                  = optional(string) // Empty value is valid only for VsoTfvc.
+    description             = optional(string)
+    publish_runbook_enabled = optional(bool, true)
+    security = object({
+      token         = string
+      token_type    = string // Personal Access Token or oauth
+      refresh_token = optional(string)
+    })
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+      update = optional(string)
+    }))
+  }))
+  default     = {}
+  nullable    = false
+  description = <<-EOT
+A list of Automation Source Controls which should be created in this Automation Account.
+  `name` - (Required) The name of the Source Control.
+  `folder_path` - (Required) The folder path in the repository.
+  `repository_url` - (Required) The URL of the repository.
+  `source_control_type` - (Required) The type of the source control. Possible values are `GitHub`, `VsoGit` and `VsoTfvc`.
+  `automatic-sync` - (Optional) Whether to automatically sync the source control. Defaults to `false`.
+  `branch` - (Optional) The branch of the repository. Empty value is valid only for `VsoTfvc`.
+  `description` - (Optional) A description for this Source Control.
+  `publish_runbook_enabled` - (Optional) Whether to publish the runbook. Defaults to `true`.
+  `security` - (Required) The security block.
+    `token` - (Required) The token to use for the source control.
+    `token_type` - (Required) The type of the token. Possible values are `PersonalAccessToken` and `oauth`.
+    `refresh_token` - (Optional) The refresh token to use for the source control.
+  `timeouts` - (Optional) The timeouts block.
+EOT
+}

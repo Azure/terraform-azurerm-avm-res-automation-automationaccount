@@ -76,7 +76,7 @@ module "azurerm_automation_account" {
       }
     }
   }
-  // Need to understand the purpose of below
+  // Need to understand the purpose of below as it is created as part of connections block
   # automation_connection_certificates = {
   #   auto_conn_cert_key1 = {
   #     connection_key = "auto_conn_key1"
@@ -84,5 +84,5 @@ module "azurerm_automation_account" {
   #     subscription_id = data.azurerm_client_config.example.subscription_id
   #   }
   # }
-  
+
 }

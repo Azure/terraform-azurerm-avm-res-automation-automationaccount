@@ -91,7 +91,7 @@ resource "azurerm_linux_virtual_machine" "this" {
 
 resource "azurerm_virtual_machine_extension" "this" {
   depends_on           = [module.azurerm_automation_account]
-  name                 = "HybridWorkerExtension2"
+  name                 = "HybridWorkerExtension"
   virtual_machine_id   = azurerm_linux_virtual_machine.this.id
   publisher            = "Microsoft.Azure.Automation.HybridWorker"
   type                 = "HybridWorkerForLinux"
@@ -117,38 +117,59 @@ resource "null_resource" "delay" {
 
 # This is the module call
 module "azurerm_automation_account" {
-  source              = "../../"
-  name                = "example-account"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "Basic"
+  source                        = "../../"
+  name                          = "example-account"
+  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.this.name
+  sku                           = "Basic"
+  public_network_access_enabled = false
   tags = {
     environment = "development"
   }
 
-  // Need to add a timer here as automation account is unable to find the credential in first try
-  automation_credentials = {
-    auto_cred_key1 = {
-      name        = "example-credential"
-      description = "This is an example credential"
-      username    = "admin"
-      password    = "example_pwd"
+  automation_runbooks = {
+    auto_runbook_key1 = {
+      name         = "Get-AzureVMTutorial"
+      description  = "This is an example runbook"
+      script_path  = "runbook.ps1"
+      log_verbose  = "true"
+      log_progress = "true"
+      runbook_type = "PowerShellWorkflow"
+      publish_content_link = {
+        uri = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/c4935ffb69246a6058eb24f54640f53f69d3ac9f/101-automation-runbook-getvms/Runbooks/Get-AzureVMTutorial.ps1"
+      }
     }
-    # depends_on = [null_resource.delay]
   }
 
   automation_hybrid_runbook_worker_groups = {
     auto_worker_group_key1 = {
-      name            = "example-worker-group"
-      credential_name = "example-credential"
+      name = "example-worker-group"
     }
   }
 
-  // how to add an existing VM as a hybrid worker ? tried but getting errors
   automation_hybrid_runbook_workers = {
     auto_worker_key1 = {
       hybrid_worker_group_key = "auto_worker_group_key1"
       vm_resource_id          = azurerm_linux_virtual_machine.this.id
+    }
+  }
+
+  // the apply gets stuck at watcher deployment and fails with timeout. Need to verify what is wrong here
+  automation_watchers = {
+    auto_watcher_key1 = {
+      name                           = "example-watcher"
+      runbook_key                    = "auto_runbook_key1"
+      hybrid_worker_group_key        = "auto_worker_group_key1"
+      execution_frequency_in_seconds = 42
+      description                    = "This is an example watcher"
+      etag                           = "W/\"d1b3e3f2-1f2d-4b4d-8d0b-0b3b3b3b3b3b\""
+      tags = {
+        environment = "development"
+      }
+      script_parameters = {
+        param1 = "value1"
+        param2 = "value2"
+      }
     }
   }
 }

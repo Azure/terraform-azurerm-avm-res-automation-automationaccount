@@ -1,5 +1,5 @@
 resource "azurerm_automation_python3_package" "this" {
-for_each = var.automation_python3_packages != null ? var.automation_python3_packages : {}
+  for_each                = var.automation_python3_packages != null ? var.automation_python3_packages : {}
   automation_account_name = azurerm_automation_account.this.name
   content_uri             = each.value.content_uri
   name                    = each.value.name
