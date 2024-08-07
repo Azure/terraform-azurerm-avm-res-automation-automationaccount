@@ -56,7 +56,7 @@ module "azurerm_automation_account" {
     }
   }
 
-// usimg self-signed certificate for testing, exmple is failing with "invalid base64"
+  // usimg self-signed certificate for testing, exmple is failing with "invalid base64"
   # automation_certificates = {
   #   auto_cert_key1 = {
   #     name        = "example-certificate"
@@ -79,7 +79,7 @@ module "azurerm_automation_account" {
     }
   }
 
-// the below block doesnt seem to work
+  // the below block doesnt seem to work
   # automation_connection_certificates = {
   #   auto_conn_cert_key1 = {
   #     automation_certificate_name = "example-certificate"
@@ -100,7 +100,7 @@ module "azurerm_automation_account" {
     }
   }
 
-// All modules are automatically getting loaded. How to test the below example block?
+  // All modules are automatically getting loaded. How to test the below example block?
   # automation_modules = {
   #   auto_module_key1 = {
   #     name        = "xActiveDirectory"

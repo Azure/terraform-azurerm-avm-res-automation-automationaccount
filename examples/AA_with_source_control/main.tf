@@ -47,28 +47,18 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 
-  automation_runbooks = {
-    auto_runbook_key1 = {
-      name         = "Get-AzureVMTutorial"
-      description  = "This is an example runbook"
-      script_path  = "runbook.ps1"
-      log_verbose  = "true"
-      log_progress = "true"
-      runbook_type = "PowerShellWorkflow"
-      publish_content_link = {
-        uri = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/c4935ffb69246a6058eb24f54640f53f69d3ac9f/101-automation-runbook-getvms/Runbooks/Get-AzureVMTutorial.ps1"
-      }
-    }
-  }
+  automation_source_controls = {
+    auto_source-control_key1 = {
+      name                = "example-source-control"
+      description         = "This is an example source control"
+      source_control_type = "GitHub"
+      folder_path         = "/"
+      repository_url      = "https://github.com/ABCD/XYZ.git"
+      branch              = "dev"
 
-  automation_webhooks = {
-    auto_webhook_key1 = {
-      name         = "TestRunbook_webhook"
-      expiry_time  = "2024-12-31T00:00:00Z"
-      enabled      = true
-      runbook_name = "Get-AzureVMTutorial"
-      parameters = {
-        input = "parameter"
+      security = {
+        token_type = "PersonalAccessToken"
+        token      = "ghp_xxxxxx"
       }
     }
   }

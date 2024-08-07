@@ -1,5 +1,5 @@
 resource "azurerm_automation_module" "this" {
-for_each = var.automation_modules != null ? var.automation_modules : {}
+  for_each                = var.automation_modules != null ? var.automation_modules : {}
   automation_account_name = azurerm_automation_account.this.name
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
@@ -30,9 +30,9 @@ for_each = var.automation_modules != null ? var.automation_modules : {}
 }
 
 resource "azurerm_automation_powershell72_module" "this" {
-for_each = var.automation_powershell72_modules != null ? var.automation_powershell72_modules : {}
-  name                    = each.value.name
-  automation_account_id =  azurerm_automation_account.this.id
+  for_each              = var.automation_powershell72_modules != null ? var.automation_powershell72_modules : {}
+  name                  = each.value.name
+  automation_account_id = azurerm_automation_account.this.id
 
   dynamic "module_link" {
     for_each = each.value.module_link == null ? [] : [each.value.module_link]
@@ -43,7 +43,7 @@ for_each = var.automation_powershell72_modules != null ? var.automation_powershe
         for_each = module_link.value.hash == null ? [] : [module_link.value.hash]
         content {
           algorithm = hash.value.algorithm
-          value    = hash.value.value
+          value     = hash.value.value
         }
       }
     }
