@@ -1,5 +1,6 @@
 resource "azurerm_automation_schedule" "this" {
-  for_each                = var.automation_schedules != null ? var.automation_schedules : {}
+  for_each = var.automation_schedules != null ? var.automation_schedules : {}
+
   automation_account_name = azurerm_automation_account.this.name
   frequency               = each.value.frequency
   name                    = each.value.name
@@ -14,6 +15,7 @@ resource "azurerm_automation_schedule" "this" {
 
   dynamic "monthly_occurrence" {
     for_each = each.value.monthly_occurrence == null ? [] : [each.value.monthly_occurrence]
+
     content {
       day        = monthly_occurrence.value.day
       occurrence = monthly_occurrence.value.occurrence
@@ -21,6 +23,7 @@ resource "azurerm_automation_schedule" "this" {
   }
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
+
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete

@@ -12,16 +12,6 @@ provider "azurerm" {
   features {}
 }
 
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see https://aka.ms/avm/telemetryinfo.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
-}
-
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -30,8 +20,8 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
-  name     = module.naming.resource_group.name_unique
   location = "centralindia"
+  name     = module.naming.resource_group.name_unique
 }
 
 data "azurerm_client_config" "example" {}
@@ -76,7 +66,7 @@ module "azurerm_automation_account" {
       }
     }
   }
-  // Need to understand the purpose of below as it is created as part of connections block
+  # Need to understand the purpose of below as it is created as part of connections block
   # automation_connection_certificates = {
   #   auto_conn_cert_key1 = {
   #     connection_key = "auto_conn_key1"

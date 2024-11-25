@@ -4,8 +4,8 @@ resource "azurerm_automation_variable_bool" "this" {
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
   value                   = each.value.value
-  description             = each.value.description
   encrypted               = each.value.encrypted
+  description             = each.value.description
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -24,8 +24,8 @@ resource "azurerm_automation_variable_datetime" "this" {
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
   value                   = each.value.value
-  description             = each.value.description
   encrypted               = each.value.encrypted
+  description             = each.value.description
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -44,8 +44,8 @@ resource "azurerm_automation_variable_int" "this" {
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
   value                   = each.value.value
-  description             = each.value.description
   encrypted               = each.value.encrypted
+  description             = each.value.description
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -64,8 +64,8 @@ resource "azurerm_automation_variable_object" "this" {
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
   value                   = each.value.value
-  description             = each.value.description
   encrypted               = each.value.encrypted
+  description             = each.value.description
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
@@ -84,8 +84,8 @@ resource "azurerm_automation_variable_string" "this" {
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
   value                   = each.value.value
-  description             = each.value.description
   encrypted               = each.value.encrypted
+  description             = each.value.description
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]

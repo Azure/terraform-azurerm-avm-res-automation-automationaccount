@@ -1,5 +1,6 @@
 resource "azurerm_automation_webhook" "this" {
-  for_each                = var.automation_webhooks != null ? var.automation_webhooks : {}
+  for_each = var.automation_webhooks != null ? var.automation_webhooks : {}
+
   automation_account_name = azurerm_automation_account.this.name
   expiry_time             = each.value.expiry_time
   name                    = each.value.name
@@ -12,6 +13,7 @@ resource "azurerm_automation_webhook" "this" {
 
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
+
     content {
       create = timeouts.value.create
       delete = timeouts.value.delete
@@ -19,5 +21,7 @@ resource "azurerm_automation_webhook" "this" {
       update = timeouts.value.update
     }
   }
+
+  depends_on = [azurerm_automation_runbook.this]
 }
 

@@ -1,7 +1,19 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example
+# terraform-azurerm-avm-template
 
-This deploys the module in its simplest form.
+This is a template repo for Terraform Azure Verified Modules.
+
+Things to do:
+
+1. Set up a GitHub repo environment called `test`.
+1. Configure environment protection rule to ensure that approval is required before deploying to this environment.
+1. Create a user-assigned managed identity in your test subscription.
+1. Create a role assignment for the managed identity on your test subscription, use the minimum required role.
+1. Configure federated identity credentials on the user assigned managed identity. Use the GitHub environment.
+1. Create the following environment secrets on the `test` environment:
+   1. AZURE\_CLIENT\_ID
+   1. AZURE\_TENANT\_ID
+   1. AZURE\_SUBSCRIPTION\_ID
 
 ```hcl
 terraform {
@@ -17,7 +29,6 @@ terraform {
 provider "azurerm" {
   features {}
 }
-
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -30,8 +41,6 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
-data "azurerm_client_config" "example" {}
-
 # This is the module call
 module "azurerm_automation_account" {
   source              = "../../"
@@ -43,44 +52,31 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 
-  automation_credentials = {
-    auto_cred_key1 = {
-      name        = "example-credential"
-      description = "This is an example credential"
-      username    = "admin"
-      password    = "example_pwd"
-    }
-  }
-  # automation_certificates = {
-  #   auto_cert_key1 = {
-  #     name        = "example-certificate"
-  #     description = "This is an example certificate"
-  #     base64      = filebase64("certificate.pfx")
-  #     exportable  = true
-  #   }
-  # }
-  automation_connections = {
-    auto_conn_key1 = {
-      name        = "example-connection"
-      description = "This is an example connection"
-      type        = "AzureServicePrincipal"
-      values = {
-        "ApplicationId" : "3ff01f1c-3fd0-4875-bb11-b3beb05fe07e", #"00000000-0000-0000-0000-000000000000",
-        "TenantId" : data.azurerm_client_config.example.tenant_id,
-        "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
-        "CertificateThumbprint" : "sample-certificate-thumbprint",
+  automation_runbooks = {
+    auto_runbook_key1 = {
+      name         = "Get-AzureVMTutorial"
+      description  = "This is an example runbook"
+      script_path  = "runbook.ps1"
+      log_verbose  = "true"
+      log_progress = "true"
+      runbook_type = "PowerShellWorkflow"
+      publish_content_link = {
+        uri = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/c4935ffb69246a6058eb24f54640f53f69d3ac9f/101-automation-runbook-getvms/Runbooks/Get-AzureVMTutorial.ps1"
       }
     }
   }
-  # Need to understand the purpose of below as it is created as part of connections block
-  # automation_connection_certificates = {
-  #   auto_conn_cert_key1 = {
-  #     connection_key = "auto_conn_key1"
-  #     automation_certificate_name = "example-certificate"
-  #     subscription_id = data.azurerm_client_config.example.subscription_id
-  #   }
-  # }
 
+  automation_webhooks = {
+    auto_webhook_key1 = {
+      name         = "TestRunbook_webhook"
+      expiry_time  = "2024-12-31T00:00:00Z"
+      enabled      = true
+      runbook_name = "Get-AzureVMTutorial"
+      parameters = {
+        input = "parameter"
+      }
+    }
+  }
 }
 ```
 
@@ -104,7 +100,6 @@ The following providers are used by this module:
 The following resources are used by this module:
 
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [azurerm_client_config.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
