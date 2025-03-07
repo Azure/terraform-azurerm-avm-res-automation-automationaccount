@@ -21,16 +21,12 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 4.00"
     }
     null = {
       source  = "hashicorp/null"
       version = "3.2.3"
     }
-    # random = {
-    #   source  = "hashicorp/random"
-    #   version = ">= 3.6.0"
-    # }
   }
 }
 
@@ -198,7 +194,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.00)
 
 - <a name="requirement_null"></a> [null](#requirement\_null) (3.2.3)
 
@@ -206,7 +202,7 @@ The following requirements are needed by this module:
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.00)
 
 - <a name="provider_null"></a> [null](#provider\_null) (3.2.3)
 

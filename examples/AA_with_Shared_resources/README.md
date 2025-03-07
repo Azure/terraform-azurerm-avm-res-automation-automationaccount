@@ -21,7 +21,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 4.00"
     }
   }
 }
@@ -101,10 +101,10 @@ module "azurerm_automation_account" {
       description = "This is an example schedule"
       frequency   = "Week"
       interval    = 1
-      expiry_time = "2024-12-31T00:00:00Z"
-      timezone    = "Etc/UTC"
-      start_time  = "2024-08-01T00:00:00Z"
-      week_days   = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+      #expiry_time = timeadd(timestamp, duration)
+      timezone   = "Etc/UTC"
+      start_time = "2027-04-15T18:00:15+02:00"
+      week_days  = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     }
   }
 
@@ -202,13 +202,13 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.00)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.00)
 
 ## Resources
 
