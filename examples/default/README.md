@@ -9,23 +9,13 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.7.0, < 4.0.0"
+      version = "~> 4.00"
     }
   }
 }
 
 provider "azurerm" {
   features {}
-}
-
-variable "enable_telemetry" {
-  type        = bool
-  default     = true
-  description = <<DESCRIPTION
-This variable controls whether or not telemetry is enabled for the module.
-For more information see https://aka.ms/avm/telemetryinfo.
-If it is set to false, then no telemetry will be collected.
-DESCRIPTION
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -36,16 +26,61 @@ module "naming" {
 
 # This is required for resource modules
 resource "azurerm_resource_group" "this" {
+  location = "centralindia"
   name     = module.naming.resource_group.name_unique
-  location = "MYLOCATION"
 }
 
+data "azurerm_client_config" "example" {}
+
 # This is the module call
-module "MYMODULE" {
-  source = "../../"
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  enable_telemetry = var.enable_telemetry
-  # ...
+module "azurerm_automation_account" {
+  source              = "../../"
+  name                = "example-account"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Basic"
+  tags = {
+    environment = "development"
+  }
+
+  automation_credentials = {
+    auto_cred_key1 = {
+      name        = "example-credential"
+      description = "This is an example credential"
+      username    = "admin"
+      password    = "example_pwd"
+    }
+  }
+  # automation_certificates = {
+  #   auto_cert_key1 = {
+  #     name        = "example-certificate"
+  #     description = "This is an example certificate"
+  #     base64      = filebase64("certificate.pfx")
+  #     exportable  = true
+  #   }
+  # }
+  automation_connections = {
+    auto_conn_key1 = {
+      name        = "example-connection"
+      description = "This is an example connection"
+      type        = "AzureServicePrincipal"
+      values = {
+        "ApplicationId" : "3ff01f1c-3fd0-4875-bb11-b3beb05fe07e", #"00000000-0000-0000-0000-000000000000",
+        "TenantId" : data.azurerm_client_config.example.tenant_id,
+        "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
+        "CertificateThumbprint" : "sample-certificate-thumbprint",
+      }
+    }
+  }
+  # Need to understand the purpose of below as it is created as part of connections block
+  # automation_connection_certificates = {
+  #   auto_conn_cert_key1 = {
+  #     connection_key = "auto_conn_key1"
+  #     automation_certificate_name = "example-certificate"
+  #     subscription_id = data.azurerm_client_config.example.subscription_id
+  #   }
+  # }
+
 }
 ```
 
@@ -56,19 +91,20 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.00)
 
 ## Providers
 
 The following providers are used by this module:
 
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (>= 3.7.0, < 4.0.0)
+- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.00)
 
 ## Resources
 
 The following resources are used by this module:
 
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_client_config.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -77,17 +113,7 @@ No required inputs.
 
 ## Optional Inputs
 
-The following input variables are optional (have default values):
-
-### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
-
-Description: This variable controls whether or not telemetry is enabled for the module.  
-For more information see https://aka.ms/avm/telemetryinfo.  
-If it is set to false, then no telemetry will be collected.
-
-Type: `bool`
-
-Default: `true`
+No optional inputs.
 
 ## Outputs
 
@@ -97,7 +123,7 @@ No outputs.
 
 The following Modules are called:
 
-### <a name="module_MYMODULE"></a> [MYMODULE](#module\_MYMODULE)
+### <a name="module_azurerm_automation_account"></a> [azurerm\_automation\_account](#module\_azurerm\_automation\_account)
 
 Source: ../../
 
