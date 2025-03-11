@@ -1,9 +1,9 @@
 terraform {
-  required_version = "~> 1.5"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.00"
+      version = "~> 4.0"
     }
   }
 }
@@ -86,7 +86,6 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 
-  # Need to add a timer here as automation account is unable to find the credential in first try
   automation_credentials = {
     cred_1_key = {
       name        = "admin-password-credential"
@@ -105,11 +104,10 @@ module "azurerm_automation_account" {
   automation_hybrid_runbook_worker_groups = {
     hybrid_worker_group_1_key = {
       name = "hybrid_worker_group_1"
-      #credential_name = "admin-password-credential"
+      #credential_name = "admin-password-credential" 
     }
   }
 
-  #how to add an existing VM as a hybrid worker ? tried but getting errors
   automation_hybrid_runbook_workers = {
     hybrid_worker_1_key = {
       hybrid_worker_group_key = "hybrid_worker_group_1_key"

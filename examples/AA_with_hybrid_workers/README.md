@@ -17,11 +17,11 @@ Things to do:
 
 ```hcl
 terraform {
-  required_version = "~> 1.5"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.00"
+      version = "~> 4.0"
     }
   }
 }
@@ -104,7 +104,6 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 
-  # Need to add a timer here as automation account is unable to find the credential in first try
   automation_credentials = {
     cred_1_key = {
       name        = "admin-password-credential"
@@ -123,11 +122,10 @@ module "azurerm_automation_account" {
   automation_hybrid_runbook_worker_groups = {
     hybrid_worker_group_1_key = {
       name = "hybrid_worker_group_1"
-      #credential_name = "admin-password-credential"
+      #credential_name = "admin-password-credential" 
     }
   }
 
-  #how to add an existing VM as a hybrid worker ? tried but getting errors
   automation_hybrid_runbook_workers = {
     hybrid_worker_1_key = {
       hybrid_worker_group_key = "hybrid_worker_group_1_key"
@@ -158,15 +156,9 @@ resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.5)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.00)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.00)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
 ## Resources
 

@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.00"
+      version = "~> 4.0"
     }
   }
 }
@@ -46,7 +46,7 @@ module "azurerm_automation_account" {
     }
   }
 
-  # using self-signed certificate for testing, exmple is failing with "invalid base64"
+  # uncheck below block to use your certificate
   # automation_certificates = {
   #   auto_cert_key1 = {
   #     name        = "example-certificate"
@@ -55,13 +55,14 @@ module "azurerm_automation_account" {
   #     exportable  = true
   #   }
   # }
+
   automation_connections = {
     auto_conn_key1 = {
       name        = "example-connection"
       description = "This is an example connection"
       type        = "AzureServicePrincipal"
       values = {
-        "ApplicationId" : "3ff01f1c-3fd0-4875-bb11-b3beb05fe07e", #"00000000-0000-0000-0000-000000000000",
+        "ApplicationId" : "00000000-0000-0000-0000-000000000000", # provide the appropriate value for "ApplicationId" to associate a Service principal with the Automation Account.
         "TenantId" : data.azurerm_client_config.example.tenant_id,
         "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
         "CertificateThumbprint" : "sample-certificate-thumbprint",
@@ -69,9 +70,10 @@ module "azurerm_automation_account" {
     }
   }
 
-  # the below block doesnt seem to work
+  # The below block doesnt seem to have a use case. Keeping it till further clarity from terraform
   # automation_connection_certificates = {
   #   auto_conn_cert_key1 = {
+  #     connection_key = "auto_conn_key1"
   #     automation_certificate_name = "example-certificate"
   #     subscription_id = data.azurerm_client_config.example.subscription_id
   #   }
@@ -90,37 +92,35 @@ module "azurerm_automation_account" {
     }
   }
 
-  # All modules are automatically getting loaded. How to test the below example block?
-  # automation_modules = {
-  #   auto_module_key1 = {
-  #     name        = "xActiveDirectory"
-  #     module_link = {
-  #       uri = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/quickstarts/microsoft.automation/automation-dsc-extension-configure-push-pull-mode/azuredeploy.json"
-  #     }
-  #   }
-  # }
-  # automation_powershell72_modules = {
-  #   auto_power72_key1 = {
-  #     name        = "Az.Accounts"
-  #     module_link = {
-  #       uri = "https://www.powershellgallery.com/api/v2/package/Az.Accounts/2.2.1"
-  #     }
-  #   }
-  # }
+  automation_modules = {
+    auto_module_key1 = {
+      name = "xActiveDirectory"
+      module_link = {
+        uri = "https://devopsgallerystorage.blob.core.windows.net/packages/xactivedirectory.2.19.0.nupkg"
+      }
+    }
+  }
+  automation_powershell72_modules = {
+    auto_power72_key1 = {
+      name = "ntfetch"
+      module_link = {
+        uri = "https://devopsgallerystorage.blob.core.windows.net/packages/ntfetch.0.50.0.nupkg"
+      }
+    }
+  }
 
-  # Need to verify how to get python packages with .whl extension as .tar is not supported.
-  # automation_python3_packages = {
-  #   auto_python3_key1 = {
-  #     name          = "example2"
-  #     content_uri   = "https://pypi.org/packages/source/r/requests/requests-2.31.0.tar.whl"
-  #     content_version = "2.31.0"
-  #     hash_algorithm = "sha256"
-  #     hash_value     = "942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
-  #     tags = {
-  #       environment = "development"
-  #     }
-  #   }
-  # }
+  automation_python3_packages = {
+    auto_python3_key1 = {
+      name            = "example2"
+      content_uri     = "https://files.pythonhosted.org/packages/f9/9b/335f9764261e915ed497fcdeb11df5dfd6f7bf257d4a6a2a686d80da4d54/requests-2.32.3-py3-none-any.whl"
+      content_version = "2.32.3"
+      hash_algorithm  = "sha256"
+      hash_value      = "70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6"
+      tags = {
+        environment = "development"
+      }
+    }
+  }
 
   automation_variable_bools = {
     auto_var_bool_key1 = {
@@ -139,7 +139,7 @@ module "azurerm_automation_account" {
     auto_var_dt_key1 = {
       name        = "example-datetime-variable"
       description = "This is an example datetime variable"
-      value       = "2024-08-01T00:00:00Z"
+      value       = "2035-08-01T00:00:00Z"
     }
   }
 
