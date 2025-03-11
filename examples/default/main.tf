@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.00"
+      version = "~> 4.0"
     }
   }
 }
@@ -45,6 +45,7 @@ module "azurerm_automation_account" {
       password    = "example_pwd"
     }
   }
+
   # automation_certificates = {
   #   auto_cert_key1 = {
   #     name        = "example-certificate"
@@ -53,26 +54,18 @@ module "azurerm_automation_account" {
   #     exportable  = true
   #   }
   # }
+
   automation_connections = {
     auto_conn_key1 = {
       name        = "example-connection"
       description = "This is an example connection"
       type        = "AzureServicePrincipal"
       values = {
-        "ApplicationId" : "3ff01f1c-3fd0-4875-bb11-b3beb05fe07e", #"00000000-0000-0000-0000-000000000000",
+        "ApplicationId" : "00000000-0000-0000-0000-000000000000",
         "TenantId" : data.azurerm_client_config.example.tenant_id,
         "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
         "CertificateThumbprint" : "sample-certificate-thumbprint",
       }
     }
   }
-  # Need to understand the purpose of below as it is created as part of connections block
-  # automation_connection_certificates = {
-  #   auto_conn_cert_key1 = {
-  #     connection_key = "auto_conn_key1"
-  #     automation_certificate_name = "example-certificate"
-  #     subscription_id = data.azurerm_client_config.example.subscription_id
-  #   }
-  # }
-
 }

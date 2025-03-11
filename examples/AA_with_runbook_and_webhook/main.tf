@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.00"
+      version = "~> 4.0"
     }
   }
 }
@@ -11,6 +11,7 @@ terraform {
 provider "azurerm" {
   features {}
 }
+
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
@@ -51,7 +52,7 @@ module "azurerm_automation_account" {
   automation_webhooks = {
     auto_webhook_key1 = {
       name         = "TestRunbook_webhook"
-      expiry_time  = "2024-12-31T00:00:00Z"
+      expiry_time  = "2035-12-31T00:00:00Z"
       enabled      = true
       runbook_name = "Get-AzureVMTutorial"
       parameters = {

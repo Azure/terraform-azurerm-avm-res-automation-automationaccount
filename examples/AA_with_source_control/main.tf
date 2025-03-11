@@ -1,9 +1,9 @@
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.00"
+      version = "~> 4.0"
     }
   }
 }
@@ -35,19 +35,20 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 
-  automation_source_controls = {
-    auto_source-control_key1 = {
-      name                = "example-source-control"
-      description         = "This is an example source control"
-      source_control_type = "GitHub"
-      folder_path         = "/"
-      repository_url      = "https://github.com/ABCD/XYZ.git"
-      branch              = "dev"
+  # The below block as been tested with an actual github repo and with a PAT. Currently this has been generalized. Please replace with appropriate values.
+  # automation_source_controls = {
+  #   auto_source-control_key1 = {
+  #     name                = "example-source-control"
+  #     description         = "This is an example source control"
+  #     source_control_type = "GitHub"
+  #     folder_path         = "/"
+  #     repository_url      = "https://github.com/ABCD/XYZ.git"
+  #     branch              = "dev"
 
-      security = {
-        token_type = "PersonalAccessToken"
-        token      = "ghp_xxxxxx"
-      }
-    }
-  }
+  #     security = {
+  #       token_type = "PersonalAccessToken"
+  #       token      = "ghp_xxxxxx"
+  #     }
+  #   }
+  # }
 }
