@@ -9,6 +9,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "38482de8-520d-482d-b905-09bdedcb4ad6"
   features {}
 }
 
@@ -52,7 +53,7 @@ module "azurerm_automation_account" {
   automation_webhooks = {
     auto_webhook_key1 = {
       name         = "TestRunbook_webhook"
-      expiry_time  = "2035-12-31T00:00:00Z"
+      expiry_time  = "2027-12-31T00:00:00Z"
       enabled      = true
       runbook_name = "Get-AzureVMTutorial"
       parameters = {
