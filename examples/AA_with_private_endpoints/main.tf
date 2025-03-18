@@ -75,6 +75,18 @@ resource "azurerm_linux_virtual_machine" "this" {
   }
 }
 
+resource "azurerm_private_dns_zone" "this" {
+  name                = "privatelink.azure-automation.net"
+  resource_group_name = azurerm_resource_group.this.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "example" {
+  name                  = "example-link"
+  private_dns_zone_name = azurerm_private_dns_zone.this.name
+  resource_group_name   = azurerm_resource_group.this.name
+  virtual_network_id    = azurerm_virtual_network.this.id
+}
+
 # This is the module call
 module "azurerm_automation_account" {
   source              = "../../"
@@ -104,7 +116,7 @@ module "azurerm_automation_account" {
   automation_hybrid_runbook_worker_groups = {
     hybrid_worker_group_1_key = {
       name = "hybrid_worker_group_1"
-      #credential_name = "admin-password-credential" 
+      # credential_name = "admin-password-credential" 
     }
   }
 
@@ -114,8 +126,31 @@ module "azurerm_automation_account" {
       vm_resource_id          = azurerm_linux_virtual_machine.this.id
     }
   }
-}
 
+
+  private_endpoints_manage_dns_zone_group = true
+  private_endpoints = {
+    pe-webhook = {
+      # role_assignments   = {} # see interfaces/role assignments
+      # lock               = {} # see interfaces/resource locks
+      # tags               = {} # see interfaces/tags
+      name                          = "pe-webhook"
+      subnet_resource_id            = azurerm_subnet.this.id
+      network_interface_name        = "nic1"
+      subresource_name              = "Webhook"
+      private_dns_zone_group_name   = "privatelink.azure-automation.net"
+      private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
+    }
+    pe-hybridworker = {
+      name                          = "pe-hyrbidworker"
+      subnet_resource_id            = azurerm_subnet.this.id
+      network_interface_name        = "nic2"
+      subresource_name              = "DSCAndHybridWorker"
+      private_dns_zone_group_name   = "privatelink.azure-automation.net"
+      private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
+    }
+  }
+}
 resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
   name                       = "${azurerm_linux_virtual_machine.this.name}HybridWorkerExtension"
   publisher                  = "Microsoft.Azure.Automation.HybridWorker"

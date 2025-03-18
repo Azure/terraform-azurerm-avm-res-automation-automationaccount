@@ -17,11 +17,11 @@ Things to do:
 
 ```hcl
 terraform {
-  required_version = ">= 1.3.0"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.00"
+      version = "~> 4.0"
     }
   }
 }
@@ -45,7 +45,7 @@ resource "azurerm_resource_group" "this" {
 # This is the module call
 module "azurerm_automation_account" {
   source              = "../../"
-  name                = "example-account"
+  name                = module.naming.automation_account.name_unique
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "Basic"
@@ -53,21 +53,22 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 
-  automation_source_controls = {
-    auto_source-control_key1 = {
-      name                = "example-source-control"
-      description         = "This is an example source control"
-      source_control_type = "GitHub"
-      folder_path         = "/"
-      repository_url      = "https://github.com/ABCD/XYZ.git"
-      branch              = "dev"
+  # The below block as been tested with an actual github repo and with a PAT. Currently this has been generalized. Please replace with appropriate values.
+  # automation_source_controls = {
+  #   auto_source-control_key1 = {
+  #     name                = "example-source-control"
+  #     description         = "This is an example source control"
+  #     source_control_type = "GitHub"
+  #     folder_path         = "/"
+  #     repository_url      = "https://github.com/ABCD/XYZ.git"
+  #     branch              = "dev"
 
-      security = {
-        token_type = "PersonalAccessToken"
-        token      = "ghp_xxxxxx"
-      }
-    }
-  }
+  #     security = {
+  #       token_type = "PersonalAccessToken"
+  #       token      = "ghp_xxxxxx"
+  #     }
+  #   }
+  # }
 }
 ```
 
@@ -76,15 +77,9 @@ module "azurerm_automation_account" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.3.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.00)
-
-## Providers
-
-The following providers are used by this module:
-
-- <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) (~> 4.00)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
 ## Resources
 
