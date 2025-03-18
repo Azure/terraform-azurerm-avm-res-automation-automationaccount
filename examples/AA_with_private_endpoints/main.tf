@@ -90,7 +90,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "example" {
 # This is the module call
 module "azurerm_automation_account" {
   source              = "../../"
-  name                = "example-account"
+  name                = module.naming.automation_account.name_unique
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "Basic"
