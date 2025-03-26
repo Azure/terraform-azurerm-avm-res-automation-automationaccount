@@ -75,30 +75,26 @@ resource "tls_private_key" "this" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
-resource "azurerm_linux_virtual_machine" "this" {
-  admin_username                  = "testadmin"
-  location                        = azurerm_resource_group.this.location
-  name                            = "example-vm"
-  network_interface_ids           = [azurerm_network_interface.this.id]
-  resource_group_name             = azurerm_resource_group.this.name
-  size                            = "Standard_B1s"
-  disable_password_authentication = false
+resource "azurerm_windows_virtual_machine" "this" {
+  admin_password        = "P@$$w0rd1234!"
+  admin_username        = "testadmin"
+  location              = azurerm_resource_group.this.location
+  name                  = "example-vm"
+  network_interface_ids = [azurerm_network_interface.this.id]
+  resource_group_name   = azurerm_resource_group.this.name
+  size                  = "Standard_B1s"
 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
-  admin_ssh_key {
-    public_key = tls_private_key.this.public_key_openssh
-    username   = "localadmin"
-  }
   identity {
     type = "SystemAssigned" # This is required for hybrid workers
   }
   source_image_reference {
-    offer     = "0001-com-ubuntu-server-jammy"
-    publisher = "Canonical"
-    sku       = "22_04-lts"
+    offer     = "WindowsServer"
+    publisher = "MicrosoftWindowsServer"
+    sku       = "2016-Datacenter"
     version   = "latest"
   }
 }
@@ -151,7 +147,7 @@ module "azurerm_automation_account" {
   automation_hybrid_runbook_workers = {
     hybrid_worker_1_key = {
       hybrid_worker_group_key = "hybrid_worker_group_1_key"
-      vm_resource_id          = azurerm_linux_virtual_machine.this.id
+      vm_resource_id          = azurerm_windows_virtual_machine.this.id
     }
   }
 
@@ -180,11 +176,11 @@ module "azurerm_automation_account" {
   }
 }
 resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
-  name                       = "${azurerm_linux_virtual_machine.this.name}HybridWorkerExtension"
+  name                       = "${azurerm_windows_virtual_machine.this.name}HybridWorkerExtension"
   publisher                  = "Microsoft.Azure.Automation.HybridWorker"
-  type                       = "HybridWorkerForLinux"
+  type                       = "HybridWorkerForwindows"
   type_handler_version       = "1.1"
-  virtual_machine_id         = azurerm_linux_virtual_machine.this.id
+  virtual_machine_id         = azurerm_windows_virtual_machine.this.id
   auto_upgrade_minor_version = true
   settings                   = <<SETTINGS
     {
@@ -192,7 +188,7 @@ resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
     }
   SETTINGS
 
-  depends_on = [azurerm_linux_virtual_machine.this, module.azurerm_automation_account]
+  depends_on = [azurerm_windows_virtual_machine.this, module.azurerm_automation_account]
 }
 ```
 
@@ -211,7 +207,6 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_linux_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/linux_virtual_machine) (resource)
 - [azurerm_network_interface.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) (resource)
 - [azurerm_private_dns_zone.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) (resource)
 - [azurerm_private_dns_zone_virtual_network_link.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) (resource)
@@ -219,6 +214,7 @@ The following resources are used by this module:
 - [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
 - [azurerm_virtual_machine_extension.hybrid_worker_extension](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
+- [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
 - [tls_private_key.this](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) (resource)
 
 <!-- markdownlint-disable MD013 -->
