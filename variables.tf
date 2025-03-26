@@ -1276,8 +1276,8 @@ variable "private_endpoints_manage_dns_zone_group" {
 
 variable "public_network_access_enabled" {
   type        = bool
-  default     = true
-  description = "(Optional) Whether public network access is allowed for the automation account. Defaults to `true`."
+  default     = false
+  description = "(Optional) Whether public network access is allowed for the automation account. Defaults to `false`."
 }
 
 variable "role_assignments" {

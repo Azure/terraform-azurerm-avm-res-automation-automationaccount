@@ -52,7 +52,7 @@ module "azurerm_automation_account" {
   tags = {
     environment = "development"
   }
-
+  public_network_access_enabled = false
   automation_runbooks = {
     auto_runbook_key1 = {
       name         = "Get-AzureVMTutorial"

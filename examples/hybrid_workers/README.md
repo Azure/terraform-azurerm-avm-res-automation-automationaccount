@@ -23,6 +23,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.7.1"
+    }
     tls = {
       source  = "hashicorp/tls"
       version = ">= 4.0.0"
@@ -31,6 +35,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "38482de8-520d-482d-b905-09bdedcb4ad6"
   features {}
 }
 
@@ -76,14 +81,22 @@ resource "tls_private_key" "this" {
   rsa_bits  = 4096
 }
 
+
+resource "random_password" "password" {
+  length           = 16
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+  special          = true
+}
+
 resource "azurerm_windows_virtual_machine" "this" {
-  admin_password        = uuid()
-  admin_username        = "testadmin"
-  location              = azurerm_resource_group.this.location
-  name                  = "example-vm"
-  network_interface_ids = [azurerm_network_interface.this.id]
-  resource_group_name   = azurerm_resource_group.this.name
-  size                  = "Standard_B1s"
+  admin_password                    = random_password.password.result
+  admin_username                    = "testadmin"
+  location                          = azurerm_resource_group.this.location
+  name                              = "example-vm"
+  network_interface_ids             = [azurerm_network_interface.this.id]
+  resource_group_name               = azurerm_resource_group.this.name
+  size                              = "Standard_B1s"
+  vm_agent_platform_updates_enabled = true
 
   os_disk {
     caching              = "ReadWrite"
@@ -102,11 +115,12 @@ resource "azurerm_windows_virtual_machine" "this" {
 
 # This is the module call
 module "azurerm_automation_account" {
-  source              = "../../"
-  name                = module.naming.automation_account.name_unique
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "Basic"
+  source                        = "../../"
+  name                          = module.naming.automation_account.name_unique
+  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.this.name
+  sku                           = "Basic"
+  public_network_access_enabled = true
   tags = {
     environment = "development"
   }
@@ -139,12 +153,13 @@ module "azurerm_automation_account" {
       vm_resource_id          = azurerm_windows_virtual_machine.this.id
     }
   }
+
 }
 
 resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
   name                       = "${azurerm_windows_virtual_machine.this.name}HybridWorkerExtension"
   publisher                  = "Microsoft.Azure.Automation.HybridWorker"
-  type                       = "HybridWorkerForWindows"
+  type                       = "HybridWorkerForwindows"
   type_handler_version       = "1.1"
   virtual_machine_id         = azurerm_windows_virtual_machine.this.id
   auto_upgrade_minor_version = true
@@ -167,6 +182,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
+- <a name="requirement_random"></a> [random](#requirement\_random) (3.7.1)
+
 - <a name="requirement_tls"></a> [tls](#requirement\_tls) (>= 4.0.0)
 
 ## Resources
@@ -179,6 +196,7 @@ The following resources are used by this module:
 - [azurerm_virtual_machine_extension.hybrid_worker_extension](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
+- [random_password.password](https://registry.terraform.io/providers/hashicorp/random/3.7.1/docs/resources/password) (resource)
 - [tls_private_key.this](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) (resource)
 
 <!-- markdownlint-disable MD013 -->

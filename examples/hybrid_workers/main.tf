@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "3.7.1"
+    }
     tls = {
       source  = "hashicorp/tls"
       version = ">= 4.0.0"
@@ -13,6 +17,7 @@ terraform {
 }
 
 provider "azurerm" {
+  subscription_id = "38482de8-520d-482d-b905-09bdedcb4ad6"
   features {}
 }
 
@@ -58,14 +63,22 @@ resource "tls_private_key" "this" {
   rsa_bits  = 4096
 }
 
+
+resource "random_password" "password" {
+  length           = 16
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+  special          = true
+}
+
 resource "azurerm_windows_virtual_machine" "this" {
-  admin_password        = uuid()
-  admin_username        = "testadmin"
-  location              = azurerm_resource_group.this.location
-  name                  = "example-vm"
-  network_interface_ids = [azurerm_network_interface.this.id]
-  resource_group_name   = azurerm_resource_group.this.name
-  size                  = "Standard_B1s"
+  admin_password                    = random_password.password.result
+  admin_username                    = "testadmin"
+  location                          = azurerm_resource_group.this.location
+  name                              = "example-vm"
+  network_interface_ids             = [azurerm_network_interface.this.id]
+  resource_group_name               = azurerm_resource_group.this.name
+  size                              = "Standard_B1s"
+  vm_agent_platform_updates_enabled = true
 
   os_disk {
     caching              = "ReadWrite"
@@ -84,11 +97,12 @@ resource "azurerm_windows_virtual_machine" "this" {
 
 # This is the module call
 module "azurerm_automation_account" {
-  source              = "../../"
-  name                = module.naming.automation_account.name_unique
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "Basic"
+  source                        = "../../"
+  name                          = module.naming.automation_account.name_unique
+  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.this.name
+  sku                           = "Basic"
+  public_network_access_enabled = true
   tags = {
     environment = "development"
   }
@@ -121,12 +135,13 @@ module "azurerm_automation_account" {
       vm_resource_id          = azurerm_windows_virtual_machine.this.id
     }
   }
+
 }
 
 resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
   name                       = "${azurerm_windows_virtual_machine.this.name}HybridWorkerExtension"
   publisher                  = "Microsoft.Azure.Automation.HybridWorker"
-  type                       = "HybridWorkerForWindows"
+  type                       = "HybridWorkerForwindows"
   type_handler_version       = "1.1"
   virtual_machine_id         = azurerm_windows_virtual_machine.this.id
   auto_upgrade_minor_version = true

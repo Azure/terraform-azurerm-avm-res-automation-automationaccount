@@ -74,11 +74,12 @@ resource "azurerm_user_assigned_identity" "uami" {
 
 # This is the module call
 module "azurerm_automation_account" {
-  source              = "../../"
-  name                = module.naming.automation_account.name_unique
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "Basic"
+  source                        = "../../"
+  name                          = module.naming.automation_account.name_unique
+  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.this.name
+  sku                           = "Basic"
+  public_network_access_enabled = true
   # lock = {
   #   kind = "CanNotDelete"
 

@@ -26,11 +26,12 @@ resource "azurerm_resource_group" "this" {
 
 # This is the module call
 module "azurerm_automation_account" {
-  source              = "../../"
-  name                = module.naming.automation_account.name_unique
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "Basic"
+  source                        = "../../"
+  name                          = module.naming.automation_account.name_unique
+  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.this.name
+  sku                           = "Basic"
+  public_network_access_enabled = false
   tags = {
     environment = "development"
   }

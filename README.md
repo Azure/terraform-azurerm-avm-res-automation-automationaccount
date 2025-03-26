@@ -1412,11 +1412,11 @@ Default: `true`
 
 ### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
 
-Description: (Optional) Whether public network access is allowed for the automation account. Defaults to `true`.
+Description: (Optional) Whether public network access is allowed for the automation account. Defaults to `false`.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
