@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = ">= 4.0.0"
+    }
   }
 }
 
@@ -49,7 +53,10 @@ resource "azurerm_network_interface" "this" {
     subnet_id                     = azurerm_subnet.this.id
   }
 }
-
+resource "tls_private_key" "this" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
 resource "azurerm_linux_virtual_machine" "this" {
   admin_username                  = "testadmin"
   location                        = azurerm_resource_group.this.location
@@ -57,12 +64,15 @@ resource "azurerm_linux_virtual_machine" "this" {
   network_interface_ids           = [azurerm_network_interface.this.id]
   resource_group_name             = azurerm_resource_group.this.name
   size                            = "Standard_B1s"
-  admin_password                  = "Password1234!"
   disable_password_authentication = false
 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
+  }
+  admin_ssh_key {
+    public_key = tls_private_key.this.public_key_openssh
+    username   = "localadmin"
   }
   identity {
     type = "SystemAssigned" # This is required for hybrid workers
@@ -116,7 +126,7 @@ module "azurerm_automation_account" {
   automation_hybrid_runbook_worker_groups = {
     hybrid_worker_group_1_key = {
       name = "hybrid_worker_group_1"
-      # credential_name = "admin-password-credential" 
+      # credential_name = "admin-password-credential"
     }
   }
 
