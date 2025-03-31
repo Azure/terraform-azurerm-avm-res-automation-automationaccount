@@ -54,6 +54,8 @@ The following resources are used by this module:
 - [azurerm_automation_variable_string.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_variable_string) (resource)
 - [azurerm_automation_watcher.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_watcher) (resource)
 - [azurerm_automation_webhook.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_webhook) (resource)
+- [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) (resource)
 - [azurerm_private_endpoint.this_managed_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint.this_unmanaged_dns_zone_groups](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) (resource)
 - [azurerm_private_endpoint_application_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association) (resource)
@@ -104,7 +106,7 @@ Description: A list of Automation Certificates which should be created in this A
   `base64` - (Required) The base64 encoded value of the Certificate.
   `description` - (Optional) A description for this Certificate.
   `exportable` - (Optional) Whether the Certificate is exportable. Defaults to `false`.
-  `timeouts` - (Optional) The timeouts block.  
+  `timeouts` - (Optional) The timeouts block.
 
 Example Input:
 
@@ -149,7 +151,7 @@ Default: `{}`
 Description: A list of Automation Connection Certificates which should be created in this Automation Account.
   `connection_key` - (Required) The key of the Connection to use for this Connection Certificate.
   `subscription_id` - (Required) The Subscription ID to use for this Connection Certificate.
-  `automation_certificate_name` - (Required) The name of the Automation Certificate to use for this Connection Certificate.  
+  `automation_certificate_name` - (Required) The name of the Automation Certificate to use for this Connection Certificate.
 
 Example Input:
 
@@ -181,7 +183,7 @@ Description: A list of Automation Connection Classic Certificates which should b
   `connection_key` - (Required) The key of the Connection to use for this Connection Classic Certificate.
   `subscription_id` - (Required) The Subscription ID to use for this Connection Classic Certificate.
   `subscription_name` - (Required) The Subscription Name to use for this Connection Classic Certificate.
-  `certificate_asset_name` - (Required) The name of the certificate asset to use for this Connection Classic Certificate.  
+  `certificate_asset_name` - (Required) The name of the certificate asset to use for this Connection Classic Certificate.
 
 Example Input:
 ```terraform
@@ -431,7 +433,7 @@ Description: A list of Automation Modules which should be created in this Automa
     `hash` - (Optional) The hash block.
       `algorithm` - (Required) The algorithm used to hash the content.
       `value` - (Required) The value of the hash.
-  `timeouts` - (Optional) The timeouts block.  
+  `timeouts` - (Optional) The timeouts block.
 
 Example Input:
 ```terraform
@@ -1223,6 +1225,40 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings)
+
+Description:   A map of diagnostic settings to create on the Key Vault. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
+  - `log_categories` - (Optional) A set of log categories to send to the log analytics workspace. Defaults to `[]`.
+  - `log_groups` - (Optional) A set of log groups to send to the log analytics workspace. Defaults to `["allLogs"]`.
+  - `metric_categories` - (Optional) A set of metric categories to send to the log analytics workspace. Defaults to `["AllMetrics"]`.
+  - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+  - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
+  - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
+  - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
+  - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
+  - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic LogsLogs.
+
+Type:
+
+```hcl
+map(object({
+    name                                     = optional(string, null)
+    log_categories                           = optional(set(string), [])
+    log_groups                               = optional(set(string), ["allLogs"])
+    metric_categories                        = optional(set(string), ["AllMetrics"])
+    log_analytics_destination_type           = optional(string, "Dedicated")
+    workspace_resource_id                    = optional(string, null)
+    storage_account_resource_id              = optional(string, null)
+    event_hub_authorization_rule_resource_id = optional(string, null)
+    event_hub_name                           = optional(string, null)
+    marketplace_partner_resource_id          = optional(string, null)
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_enable_telemetry"></a> [enable\_telemetry](#input\_enable\_telemetry)
 
 Description:   This variable controls whether or not telemetry is enabled for the module.  
@@ -1260,6 +1296,24 @@ Description: (Optional) Whether requests using non-AAD authentication are blocke
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_lock"></a> [lock](#input\_lock)
+
+Description:   Controls the Resource Lock configuration for this resource. The following properties can be specified:
+
+  - `kind` - (Required) The type of lock. Possible values are `\"CanNotDelete\"` and `\"ReadOnly\"`.
+  - `name` - (Optional) The name of the lock. If not specified, a name will be generated based on the `kind` value. Changing this forces the creation of a new resource.
+
+Type:
+
+```hcl
+object({
+    kind = string
+    name = optional(string, null)
+  })
+```
+
+Default: `null`
 
 ### <a name="input_managed_identities"></a> [managed\_identities](#input\_managed\_identities)
 
@@ -1358,11 +1412,11 @@ Default: `true`
 
 ### <a name="input_public_network_access_enabled"></a> [public\_network\_access\_enabled](#input\_public\_network\_access\_enabled)
 
-Description: (Optional) Whether public network access is allowed for the automation account. Defaults to `true`.
+Description: (Optional) Whether public network access is allowed for the automation account. Defaults to `false`.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
 
