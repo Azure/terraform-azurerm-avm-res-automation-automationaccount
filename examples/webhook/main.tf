@@ -10,6 +10,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  subscription_id = "9ff79d1b-9fac-40a9-b1e6-f7791d2b9ba6"
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -45,6 +46,50 @@ module "azurerm_automation_account" {
       runbook_type = "PowerShellWorkflow"
       publish_content_link = {
         uri = "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/c4935ffb69246a6058eb24f54640f53f69d3ac9f/101-automation-runbook-getvms/Runbooks/Get-AzureVMTutorial.ps1"
+      }
+    }
+  }
+
+  automation_schedules = {
+    auto_schedule_key1 = {
+      name        = "TestRunbook_schedule"
+      description = "This is an example schedule"
+      start_time  = "2025-06-01T00:00:00Z"
+      expiry_time = "2027-12-31T00:00:00Z"
+      frequency   = "Week"
+      interval    = 1
+      time_zone   = "Etc/UTC"
+      week_days   = ["Monday", "Wednesday", "Friday"]
+    }
+
+    auto_schedule_key2 = {
+      name        = "TestRunbook_schedule2"
+      description = "This is an example2 schedule"
+      start_time  = "2025-07-01T00:00:00Z"
+      expiry_time = "2027-12-31T00:00:00Z"
+      frequency   = "Week"
+      interval    = 1
+      time_zone   = "Asia/Tokyo"
+      week_days   = ["Friday"]
+    }
+  }
+
+# Each Job_schedule must be associated with unique Schedule but can be associated with same Runbook.
+  automation_job_schedules = {
+    auto_job_schedule_key1 = {
+      runbook_key  = "auto_runbook_key1"
+      schedule_key = "auto_schedule_key1"
+      parameters = {
+        resourcegroup = "myResourceGroup"
+        location      = "centralindia"
+      }
+    }
+    auto_job_schedule_key2 = {
+      runbook_key  = "auto_runbook_key1"
+      schedule_key = "auto_schedule_key2"
+      parameters = {
+        resourcegroup = "myResourceGroup"
+        vmname        = "TF-VM-01"
       }
     }
   }

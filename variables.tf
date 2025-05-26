@@ -518,11 +518,12 @@ variable "automation_runbooks" {
         type          = string
       })))
     }))
-    job_schedule = optional(object({
-      parameters    = optional(map(string))
-      run_on        = optional(string)
-      schedule_name = string
-    }))
+  # Commenting out as creating a separate variable for automation_job_schedule
+    # job_schedule = optional(object({
+    #   parameters    = optional(map(string))
+    #   run_on        = optional(string)
+    #   schedule_name = string
+    # }))
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -626,7 +627,52 @@ variable "automation_runbooks" {
     }
   }
   ```
-EOT
+  EOT
+    nullable    = false
+}
+
+variable "automation_job_schedules" {
+  type = map(object({
+    runbook_key   = string
+    schedule_key  = string
+    parameters     = optional(map(string)) # must be in lowercase
+    run_on         = optional(string)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+    }))
+  }))
+  default     = {}
+  description = <<-EOT
+  A map of Automation Job Schedules to be created in this Automation Account.
+    `runbook_key` - (Required) The key of the Runbook defined in `automation_runbooks`.
+    `schedule_key` - (Required) The key of the Schedule defined in `automation_schedules`.
+    `parameters` - (Optional) A map of parameters to pass to the Runbook.
+    `run_on` - (Optional) The name of the Hybrid Worker Group the job will run on.
+    `timeouts` - (Optional) The timeouts block.
+
+  Example Input:
+  ```terraform
+  automation_job_schedule = {
+    "myjobschedule" = {
+      name          = "myjobschedule"
+      runbook_key  = "auto_runbook_key1"
+      schedule_key = "auto_schedule_key1"
+      parameters    = {
+        param1 = "value1"
+        param2 = "value2"
+      }
+      run_on = "Azure"
+      timeouts = {
+        create = "30m"
+        delete = "30m"
+        read   = "5m"
+      }
+    }
+  }
+  ```
+  EOT
   nullable    = false
 }
 
@@ -638,7 +684,7 @@ variable "automation_schedules" {
     interval    = optional(number, 1)
     start_time  = optional(string)
     expiry_time = optional(string)
-    timezone    = optional(string, "UTC")
+    timezone    = optional(string, "Etc/UTC")
     week_days   = optional(set(string))
     month_days  = optional(set(number))
     monthly_occurrence = optional(object({
@@ -661,7 +707,7 @@ variable "automation_schedules" {
     `interval` - (Optional) The number of `frequencys` between runs. Only valid when frequency is `Day`, `Hour`, `Week`, or `Month` and defaults to `1`.
     `start_time` - (Optional) The start time of the Schedule. Must be at least five minutes in the future. Defaults to seven minutes in the future from the time the resource is created.
     `expiry_time` - (Optional) The expiry time of the Schedule.
-    `timezone` - (Optional) The timezone of the Schedule. Defaults to `UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
+    `timezone` - (Optional) The timezone of the Schedule. Defaults to `Etc/UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
     `week_days` - (Optional) List of days of the week that the job should execute on. Only valid when frequency is `Week`. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday` and `Sunday`.
     `month_days` - (Optional) List of days of the month that the job should execute on. Must be between `1` and `31`. `-1` for last day of the month. Only valid when frequency is `Month`.
     `monthly_occurrence` - (Optional) One monthly_occurrence blocks as defined below to specifies occurrences of days within a month. Only valid when frequency is `Month`.
