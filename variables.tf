@@ -518,7 +518,7 @@ variable "automation_runbooks" {
         type          = string
       })))
     }))
-  # Commenting out as creating a separate variable for automation_job_schedule
+    # Commenting out as creating a separate variable for automation_job_schedule
     # job_schedule = optional(object({
     #   parameters    = optional(map(string))
     #   run_on        = optional(string)
@@ -628,15 +628,15 @@ variable "automation_runbooks" {
   }
   ```
   EOT
-    nullable    = false
+  nullable    = false
 }
 
 variable "automation_job_schedules" {
   type = map(object({
-    runbook_key   = string
-    schedule_key  = string
-    parameters     = optional(map(string)) # must be in lowercase
-    run_on         = optional(string)
+    runbook_key  = string
+    schedule_key = string
+    parameters   = optional(map(string)) # must be in lowercase
+    run_on       = optional(string)
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)

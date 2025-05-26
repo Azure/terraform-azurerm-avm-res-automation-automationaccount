@@ -10,7 +10,6 @@ terraform {
 
 provider "azurerm" {
   features {}
-  subscription_id = "9ff79d1b-9fac-40a9-b1e6-f7791d2b9ba6"
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -74,7 +73,7 @@ module "azurerm_automation_account" {
     }
   }
 
-# Each Job_schedule must be associated with unique Schedule but can be associated with same Runbook.
+  # Each Job_schedule must be associated with unique Schedule but can be associated with same Runbook.
   automation_job_schedules = {
     auto_job_schedule_key1 = {
       runbook_key  = "auto_runbook_key1"
