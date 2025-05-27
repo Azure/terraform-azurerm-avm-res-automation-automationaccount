@@ -69,14 +69,13 @@ resource "random_password" "password" {
 }
 
 resource "azurerm_windows_virtual_machine" "this" {
-  admin_password                    = random_password.password.result
-  admin_username                    = "testadmin"
-  location                          = azurerm_resource_group.this.location
-  name                              = "example-vm"
-  network_interface_ids             = [azurerm_network_interface.this.id]
-  resource_group_name               = azurerm_resource_group.this.name
-  size                              = "Standard_B1s"
-  vm_agent_platform_updates_enabled = true
+  admin_password        = random_password.password.result
+  admin_username        = "testadmin"
+  location              = azurerm_resource_group.this.location
+  name                  = "example-vm"
+  network_interface_ids = [azurerm_network_interface.this.id]
+  resource_group_name   = azurerm_resource_group.this.name
+  size                  = "Standard_B1s"
 
   os_disk {
     caching              = "ReadWrite"
@@ -107,16 +106,12 @@ resource "azurerm_private_dns_zone_virtual_network_link" "example" {
 
 # This is the module call
 module "azurerm_automation_account" {
-  source                        = "../../"
-  name                          = module.naming.automation_account.name_unique
-  location                      = azurerm_resource_group.this.location
-  resource_group_name           = azurerm_resource_group.this.name
-  sku                           = "Basic"
-  public_network_access_enabled = false
-  tags = {
-    environment = "development"
-  }
+  source = "../../"
 
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.automation_account.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Basic"
   automation_credentials = {
     cred_1_key = {
       name        = "admin-password-credential"
@@ -131,23 +126,18 @@ module "azurerm_automation_account" {
       }
     }
   }
-
   automation_hybrid_runbook_worker_groups = {
     hybrid_worker_group_1_key = {
       name = "hybrid_worker_group_1"
       # credential_name = "admin-password-credential"
     }
   }
-
   automation_hybrid_runbook_workers = {
     hybrid_worker_1_key = {
       hybrid_worker_group_key = "hybrid_worker_group_1_key"
       vm_resource_id          = azurerm_windows_virtual_machine.this.id
     }
   }
-
-
-  private_endpoints_manage_dns_zone_group = true
   private_endpoints = {
     pe-webhook = {
       # role_assignments   = {} # see interfaces/role assignments
@@ -168,6 +158,11 @@ module "azurerm_automation_account" {
       private_dns_zone_group_name   = "privatelink.azure-automation.net"
       private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
     }
+  }
+  private_endpoints_manage_dns_zone_group = true
+  public_network_access_enabled           = false
+  tags = {
+    environment = "development"
   }
 }
 resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {

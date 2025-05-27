@@ -28,8 +28,26 @@ resource "azurerm_automation_schedule" "this" {
       create = timeouts.value.create
       delete = timeouts.value.delete
       read   = timeouts.value.read
-      update = timeouts.value.update
     }
   }
 }
 
+resource "azurerm_automation_job_schedule" "this" {
+  for_each = var.automation_job_schedules != null ? var.automation_job_schedules : {}
+
+  automation_account_name = azurerm_automation_account.this.name
+  resource_group_name     = azurerm_automation_account.this.resource_group_name
+  runbook_name            = azurerm_automation_runbook.this[each.value.runbook_key].name
+  schedule_name           = azurerm_automation_schedule.this[each.value.schedule_key].name
+  parameters              = each.value.parameters != null ? each.value.parameters : null
+
+  dynamic "timeouts" {
+    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
+
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+    }
+  }
+}

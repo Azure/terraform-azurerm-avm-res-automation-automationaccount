@@ -44,32 +44,16 @@ resource "azurerm_resource_group" "this" {
 
 # This is the module call
 module "azurerm_automation_account" {
-  source                        = "../../"
-  name                          = module.naming.automation_account.name_unique
+  source = "../../"
+
   location                      = azurerm_resource_group.this.location
+  name                          = module.naming.automation_account.name_unique
   resource_group_name           = azurerm_resource_group.this.name
   sku                           = "Basic"
   public_network_access_enabled = false
   tags = {
     environment = "development"
   }
-
-  # The below block as been tested with an actual github repo and with a PAT. Currently this has been generalized. Please replace with appropriate values.
-  # automation_source_controls = {
-  #   auto_source-control_key1 = {
-  #     name                = "example-source-control"
-  #     description         = "This is an example source control"
-  #     source_control_type = "GitHub"
-  #     folder_path         = "/"
-  #     repository_url      = "https://github.com/ABCD/XYZ.git"
-  #     branch              = "dev"
-
-  #     security = {
-  #       token_type = "PersonalAccessToken"
-  #       token      = "ghp_xxxxxx"
-  #     }
-  #   }
-  # }
 }
 ```
 
