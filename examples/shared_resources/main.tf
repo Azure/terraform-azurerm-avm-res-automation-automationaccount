@@ -28,35 +28,12 @@ data "azurerm_client_config" "example" {}
 
 # This is the module call
 module "azurerm_automation_account" {
-  source                        = "../../"
-  name                          = module.naming.automation_account.name_unique
-  location                      = azurerm_resource_group.this.location
-  resource_group_name           = azurerm_resource_group.this.name
-  sku                           = "Basic"
-  public_network_access_enabled = false
-  tags = {
-    environment = "development"
-  }
+  source = "../../"
 
-  automation_credentials = {
-    auto_cred_key1 = {
-      name        = "example-credential"
-      description = "This is an example credential"
-      username    = "admin"
-      password    = "example_pwd"
-    }
-  }
-
-  # uncheck below block to use your certificate
-  # automation_certificates = {
-  #   auto_cert_key1 = {
-  #     name        = "example-certificate"
-  #     description = "This is an example certificate"
-  #     base64      = filebase64("certificate.pfx")
-  #     exportable  = true
-  #   }
-  # }
-
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.automation_account.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Basic"
   automation_connections = {
     auto_conn_key1 = {
       name        = "example-connection"
@@ -70,29 +47,14 @@ module "azurerm_automation_account" {
       }
     }
   }
-
-  # The below block doesnt seem to have a use case. Keeping it till further clarity from terraform
-  # automation_connection_certificates = {
-  #   auto_conn_cert_key1 = {
-  #     connection_key = "auto_conn_key1"
-  #     automation_certificate_name = "example-certificate"
-  #     subscription_id = data.azurerm_client_config.example.subscription_id
-  #   }
-  # }
-
-  automation_schedules = {
-    auto_schedule_key1 = {
-      name        = "tfex-automation-schedule"
-      description = "This is an example schedule"
-      frequency   = "Week"
-      interval    = 1
-      #expiry_time = timeadd(timestamp, duration)
-      timezone   = "Etc/UTC"
-      start_time = "2027-04-15T18:00:15+02:00"
-      week_days  = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+  automation_credentials = {
+    auto_cred_key1 = {
+      name        = "example-credential"
+      description = "This is an example credential"
+      username    = "admin"
+      password    = "example_pwd"
     }
   }
-
   automation_modules = {
     auto_module_key1 = {
       name = "xActiveDirectory"
@@ -109,7 +71,6 @@ module "azurerm_automation_account" {
       }
     }
   }
-
   automation_python3_packages = {
     auto_python3_key1 = {
       name            = "example2"
@@ -122,7 +83,18 @@ module "azurerm_automation_account" {
       }
     }
   }
-
+  automation_schedules = {
+    auto_schedule_key1 = {
+      name        = "tfex-automation-schedule"
+      description = "This is an example schedule"
+      frequency   = "Week"
+      interval    = 1
+      #expiry_time = timeadd(timestamp, duration)
+      timezone   = "Etc/UTC"
+      start_time = "2027-04-15T18:00:15+02:00"
+      week_days  = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    }
+  }
   automation_variable_bools = {
     auto_var_bool_key1 = {
       name        = "example-bool-variable"
@@ -135,7 +107,6 @@ module "azurerm_automation_account" {
       value       = false
     }
   }
-
   automation_variable_datetimes = {
     auto_var_dt_key1 = {
       name        = "example-datetime-variable"
@@ -143,7 +114,6 @@ module "azurerm_automation_account" {
       value       = "2035-08-01T00:00:00Z"
     }
   }
-
   automation_variable_ints = {
     auto_var_int_key1 = {
       name        = "example-int-variable"
@@ -156,7 +126,6 @@ module "azurerm_automation_account" {
       value       = 36
     }
   }
-
   automation_variable_objects = {
     auto_var_obj_key1 = {
       name        = "example-object-variable"
@@ -167,12 +136,15 @@ module "azurerm_automation_account" {
       })
     }
   }
-
   automation_variable_strings = {
     auto_var_string_key1 = {
       name        = "example-string-variable"
       description = "This is an example string variable"
       value       = "example-value"
     }
+  }
+  public_network_access_enabled = false
+  tags = {
+    environment = "development"
   }
 }
