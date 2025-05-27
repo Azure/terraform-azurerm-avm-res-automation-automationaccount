@@ -33,11 +33,13 @@ resource "azurerm_log_analytics_workspace" "workspace" {
 }
 
 resource "azurerm_eventhub_namespace" "eventhub_namespace" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.eventhub_namespace.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "Standard"
-  capacity            = 1
+  location                 = azurerm_resource_group.this.location
+  name                     = module.naming.eventhub_namespace.name_unique
+  resource_group_name      = azurerm_resource_group.this.name
+  sku                      = "Standard"
+  auto_inflate_enabled     = true
+  capacity                 = 1
+  maximum_throughput_units = 1
   tags = {
     environment = "avm-demo"
   }
