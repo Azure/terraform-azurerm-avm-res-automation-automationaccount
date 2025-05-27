@@ -18,9 +18,7 @@ resource "azurerm_automation_hybrid_runbook_worker_group" "this" {
   }
 }
 
-resource "random_uuid" "this" {
-  for_each = var.automation_hybrid_runbook_workers != null ? var.automation_hybrid_runbook_workers : {}
-}
+resource "random_uuid" "this" {}
 
 resource "azurerm_automation_hybrid_runbook_worker" "this" {
   for_each = var.automation_hybrid_runbook_workers != null ? var.automation_hybrid_runbook_workers : {}
@@ -29,5 +27,5 @@ resource "azurerm_automation_hybrid_runbook_worker" "this" {
   resource_group_name     = azurerm_automation_account.this.resource_group_name
   vm_resource_id          = each.value.vm_resource_id
   worker_group_name       = azurerm_automation_hybrid_runbook_worker_group.this[each.value.hybrid_worker_group_key].name
-  worker_id               = random_uuid.this[each.key].result
+  worker_id               = random_uuid.this.result
 }

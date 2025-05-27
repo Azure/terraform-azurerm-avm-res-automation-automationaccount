@@ -35,8 +35,8 @@ resource "azurerm_automation_schedule" "this" {
 resource "azurerm_automation_job_schedule" "this" {
   for_each = var.automation_job_schedules != null ? var.automation_job_schedules : {}
 
-  resource_group_name     = azurerm_automation_account.this.resource_group_name
   automation_account_name = azurerm_automation_account.this.name
+  resource_group_name     = azurerm_automation_account.this.resource_group_name
   runbook_name            = azurerm_automation_runbook.this[each.value.runbook_key].name
   schedule_name           = azurerm_automation_schedule.this[each.value.schedule_key].name
   parameters              = each.value.parameters != null ? each.value.parameters : null

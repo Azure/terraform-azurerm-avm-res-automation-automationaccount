@@ -68,43 +68,12 @@ resource "azurerm_user_assigned_identity" "uami" {
 
 # This is the module call
 module "azurerm_automation_account" {
-  source                        = "../../"
-  name                          = module.naming.automation_account.name_unique
-  location                      = azurerm_resource_group.this.location
-  resource_group_name           = azurerm_resource_group.this.name
-  sku                           = "Basic"
-  public_network_access_enabled = true
-  # lock = {
-  #   kind = "CanNotDelete"
+  source = "../../"
 
-  # }
-  tags = {
-    environment = "development"
-  }
-  managed_identities = {
-    system_assigned = true
-    user_assigned_resource_ids = [
-      azurerm_user_assigned_identity.uami.id
-    ]
-  }
-  automation_credentials = {
-    auto_cred_key1 = {
-      name        = "example-credential"
-      description = "This is an example credential"
-      username    = "admin"
-      password    = "example_pwd"
-    }
-  }
-
-  # automation_certificates = {
-  #   auto_cert_key1 = {
-  #     name        = "example-certificate"
-  #     description = "This is an example certificate"
-  #     base64      = filebase64("certificate.pfx")
-  #     exportable  = true
-  #   }
-  # }
-
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.automation_account.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Basic"
   automation_connections = {
     auto_conn_key1 = {
       name        = "example-connection"
@@ -118,21 +87,12 @@ module "azurerm_automation_account" {
       }
     }
   }
-  role_assignments = {
-    self_contributor = {
-      role_definition_id_or_name       = "Contributor"
-      principal_id                     = data.azurerm_client_config.example.object_id
-      skip_service_principal_aad_check = true
-      principal_type                   = "ServicePrincipal"
-    },
-    role_assignment_2 = {
-      role_definition_id_or_name       = "Reader"
-      principal_id                     = data.azurerm_client_config.example.object_id # replace the principal id with appropriate one
-      description                      = "Example role assignment 2 of reader role"
-      skip_service_principal_aad_check = false
-      principal_type                   = "ServicePrincipal"
-      #condition                        = "@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase 'foo_storage_container'"
-      #condition_version                = "2.0"
+  automation_credentials = {
+    auto_cred_key1 = {
+      name        = "example-credential"
+      description = "This is an example credential"
+      username    = "admin"
+      password    = "example_pwd"
     }
   }
   diagnostic_settings = {
@@ -153,6 +113,32 @@ module "azurerm_automation_account" {
       event_hub_name                           = azurerm_eventhub_namespace.eventhub_namespace.name
     }
   }
-
-
+  managed_identities = {
+    system_assigned = true
+    user_assigned_resource_ids = [
+      azurerm_user_assigned_identity.uami.id
+    ]
+  }
+  public_network_access_enabled = true
+  role_assignments = {
+    self_contributor = {
+      role_definition_id_or_name       = "Contributor"
+      principal_id                     = data.azurerm_client_config.example.object_id
+      skip_service_principal_aad_check = true
+      principal_type                   = "ServicePrincipal"
+    },
+    role_assignment_2 = {
+      role_definition_id_or_name       = "Reader"
+      principal_id                     = data.azurerm_client_config.example.object_id # replace the principal id with appropriate one
+      description                      = "Example role assignment 2 of reader role"
+      skip_service_principal_aad_check = false
+      principal_type                   = "ServicePrincipal"
+      #condition                        = "@Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase 'foo_storage_container'"
+      #condition_version                = "2.0"
+    }
+  }
+  # }
+  tags = {
+    environment = "development"
+  }
 }
