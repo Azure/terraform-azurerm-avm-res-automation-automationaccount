@@ -38,7 +38,6 @@ module "azurerm_automation_account" {
     auto_conn_key1 = {
       name        = "example-connection"
       description = "This is an example connection"
-      type        = "Azure"
       type        = "AzureServicePrincipal"
       values = {
         "ApplicationId" : "00000000-0000-0000-0000-000000000000",
