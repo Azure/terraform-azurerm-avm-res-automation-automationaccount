@@ -16,6 +16,7 @@ terraform {
 
 provider "azurerm" {
   features {}
+  # subscription_id = "your-subscription-id" # Replace with your Azure subscription ID
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -34,34 +35,12 @@ data "azurerm_client_config" "example" {}
 
 # This is the module call
 module "azurerm_automation_account" {
-  source                        = "../../"
-  name                          = module.naming.automation_account.name_unique
-  location                      = azurerm_resource_group.this.location
-  resource_group_name           = azurerm_resource_group.this.name
-  public_network_access_enabled = true
-  sku                           = "Basic"
-  tags = {
-    environment = "development"
-  }
+  source = "../../"
 
-  automation_credentials = {
-    auto_cred_key1 = {
-      name        = "example-credential"
-      description = "This is an example credential"
-      username    = "admin"
-      password    = "example_pwd"
-    }
-  }
-
-  # automation_certificates = {
-  #   auto_cert_key1 = {
-  #     name        = "example-certificate"
-  #     description = "This is an example certificate"
-  #     base64      = filebase64("certificate.pfx")
-  #     exportable  = true
-  #   }
-  # }
-
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.automation_account.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "Basic"
   automation_connections = {
     auto_conn_key1 = {
       name        = "example-connection"
@@ -74,6 +53,18 @@ module "azurerm_automation_account" {
         "CertificateThumbprint" : "sample-certificate-thumbprint",
       }
     }
+  }
+  automation_credentials = {
+    auto_cred_key1 = {
+      name        = "example-credential"
+      description = "This is an example credential"
+      username    = "admin"
+      password    = "example_pwd"
+    }
+  }
+  public_network_access_enabled = true
+  tags = {
+    environment = "development"
   }
 }
 ```

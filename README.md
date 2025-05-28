@@ -41,6 +41,7 @@ The following resources are used by this module:
 - [azurerm_automation_credential.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_credential) (resource)
 - [azurerm_automation_hybrid_runbook_worker.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_hybrid_runbook_worker) (resource)
 - [azurerm_automation_hybrid_runbook_worker_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_hybrid_runbook_worker_group) (resource)
+- [azurerm_automation_job_schedule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_job_schedule) (resource)
 - [azurerm_automation_module.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_module) (resource)
 - [azurerm_automation_powershell72_module.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_powershell72_module) (resource)
 - [azurerm_automation_python3_package.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_python3_package) (resource)
@@ -250,7 +251,7 @@ Default: `{}`
 
 Description: A list of Automation Connections which should be created in this Automation Account.
   `name` - (Required) The name of the Connection.
-  `type` - (Required) The type of the Connection.
+  `type` - (Required) The type of the Connection. Can be either builtin type such as `Azure`, `AzureClassicCertificate`, and `AzureServicePrincipal`, or a user defined types. Changing this forces a new resource to be created.
   `values` - (Required) A mapping of key value pairs passed to the connection. Different `type` needs different parameters in the `values`. Builtin types have required field values as below:
     `Azure`: parameters `AutomationCertificateName` and `SubscriptionID`.
     `AzureServicePrincipal`: parameters `TenantID`, `ApplicationID`, and `CertificateThumbprint`.
@@ -424,6 +425,54 @@ map(object({
 
 Default: `{}`
 
+### <a name="input_automation_job_schedules"></a> [automation\_job\_schedules](#input\_automation\_job\_schedules)
+
+Description: A map of Automation Job Schedules to be created in this Automation Account.
+  `runbook_key` - (Required) The key of the Runbook defined in `automation_runbooks`.
+  `schedule_key` - (Required) The key of the Schedule defined in `automation_schedules`.
+  `parameters` - (Optional) A map of parameters to pass to the Runbook.
+  `run_on` - (Optional) The name of the Hybrid Worker Group the job will run on.
+  `timeouts` - (Optional) The timeouts block.
+
+Example Input:
+```terraform
+automation_job_schedule = {
+  "myjobschedule" = {
+    name          = "myjobschedule"
+    runbook_key  = "auto_runbook_key1"
+    schedule_key = "auto_schedule_key1"
+    parameters    = {
+      param1 = "value1"
+      param2 = "value2"
+    }
+    run_on = "Azure"
+    timeouts = {
+      create = "30m"
+      delete = "30m"
+      read   = "5m"
+    }
+  }
+}
+```
+
+Type:
+
+```hcl
+map(object({
+    runbook_key  = string
+    schedule_key = string
+    parameters   = optional(map(string)) # must be in lowercase
+    run_on       = optional(string)
+    timeouts = optional(object({
+      create = optional(string)
+      delete = optional(string)
+      read   = optional(string)
+    }))
+  }))
+```
+
+Default: `{}`
+
 ### <a name="input_automation_modules"></a> [automation\_modules](#input\_automation\_modules)
 
 Description: A list of Automation Modules which should be created in this Automation Account.
@@ -543,7 +592,7 @@ Description: A list of Automation Python 3 packages which should be created in t
   `content_uri` - (Required) The URI of the content. Changing this forces a new Automation Python3 Package to be created.
   `content_version` - (Optional) The version of the content.  The value should meet the system.version class format like `1.1.1`. Changing this forces a new Automation Python3 Package to be created.
   `hash_algorithm` - (Optional) Specify the hash algorithm used to hash the content of the python3 package. Changing this forces a new Automation Python3 Package to be created.
-  `hash_value` - (Optional) Specity the hash value of the content. Changing this forces a new Automation Python3 Package to be created.
+  `hash_value` - (Optional) Specify the hash value of the content. Changing this forces a new Automation Python3 Package to be created.
   `tags` - (Optional) A mapping of tags to assign to the Module.
   `timeouts` - (Optional) The timeouts block.
 
@@ -595,13 +644,13 @@ Default: `{}`
 
 Description: A list of Automation Runbooks which should be created in this Automation Account.
   `name` - (Required) The name of the Runbook.
-  `runbook_type` - (Required) The type of the Runbook. Possible values are `PowerShell`, `PowerShellWorkflow`, `Graph`, `GraphPowerShell`, `GraphPowerShellWorkflow`, `GraphPython2`, `GraphPython3`, `GraphPowerShellCore`, `GraphPowerShellCoreWorkflow`, `GraphPowerShellCorePython2`, `GraphPowerShellCorePython3`, `GraphPowerShellCorePowerShell`, `GraphPowerShellCorePowerShellWorkflow`, `GraphPowerShellCorePowerShellPython2`, `GraphPowerShellCorePowerShellPython3`, `GraphPowerShellCorePowerShellCore`, `GraphPowerShellCorePowerShellCoreWorkflow`, `GraphPowerShellCorePowerShellCorePython2`, `GraphPowerShellCorePowerShellCorePython3`.
+  `runbook_type` - (Required) The type of the Runbook. Possible values are `PowerShell`, `PowerShellWorkflow`, `Graph`, `GraphPowerShell`, `GraphPowerShellWorkflow`, `PowerShell72`, `Python3`, `Python2` or `Script`.
   `log_process` - (Required) Whether to log process details. Defaults to `true`.
   `log_verbose` - (Required) Whether to log verbose details. Defaults to `true`.
   `description` - (Optional) A description for this Runbook.
   `content` - (Optional) The content of the Runbook. Required if `publish_content_link` is not specified.
   `tags` - (Optional) A mapping of tags to assign to the Runbook.
-  `log_activity_trace_level` - (Optional) The log activity trace level. Defaults to `null`.
+  `log_activity_trace_level` - (Optional) The log activity trace level. Specifies the activity-level tracing options of the runbook, available only for Graphical runbooks. Possible values are `0` for None, `9` for Basic, and `15` for Detailed. Must turn on Verbose logging in order to see the tracing.
   `publish_content_link` - (Optional) The publish content link block.
     `uri` - (Required) The URI of the content.
     `version` - (Optional) The version of the content.
@@ -623,10 +672,6 @@ Description: A list of Automation Runbooks which should be created in this Autom
       `mandatory` - (Optional) Whether the parameter is mandatory. Defaults to `null`.
       `position` - (Optional) The position of the parameter.
       `type` - (Required) The type of the parameter.
-  `job_schedule` - (Optional) The job schedule block.
-    `parameters` - (Required) A mapping of parameters.
-    `run_on` - (Required) The run on value.
-    `schedule_name` - (Required) The name of the schedule.
   `timeouts` - (Optional) The timeouts block.
 
 Example Input:
@@ -672,11 +717,6 @@ automation_runbooks = {
           type          = "string"
         }
       ]
-    }
-    job_schedule = {
-      parameters    = {"param1"="value1"}
-      run_on        = "Azure"
-      schedule_name = "myschedule"
     }
     timeouts = {
       create = "30m"
@@ -727,11 +767,6 @@ map(object({
         type          = string
       })))
     }))
-    job_schedule = optional(object({
-      parameters    = optional(map(string))
-      run_on        = optional(string)
-      schedule_name = string
-    }))
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -752,12 +787,12 @@ Description: A list of Automation Schedules which should be created in this Auto
   `interval` - (Optional) The number of `frequencys` between runs. Only valid when frequency is `Day`, `Hour`, `Week`, or `Month` and defaults to `1`.
   `start_time` - (Optional) The start time of the Schedule. Must be at least five minutes in the future. Defaults to seven minutes in the future from the time the resource is created.
   `expiry_time` - (Optional) The expiry time of the Schedule.
-  `timezone` - (Optional) The timezone of the Schedule. Defaults to `UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
+  `timezone` - (Optional) The timezone of the Schedule. Defaults to `Etc/UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
   `week_days` - (Optional) List of days of the week that the job should execute on. Only valid when frequency is `Week`. Possible values are `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday` and `Sunday`.
   `month_days` - (Optional) List of days of the month that the job should execute on. Must be between `1` and `31`. `-1` for last day of the month. Only valid when frequency is `Month`.
   `monthly_occurrence` - (Optional) One monthly\_occurrence blocks as defined below to specifies occurrences of days within a month. Only valid when frequency is `Month`.
-    `day` - (Required) The day of the month.
-    `occurrence` - (Required) The occurrence of the day in the month.
+    `day` - (Required) The day of the month. Must be one of `Monday`, `Tuesday`, `Wednesday`, `Thursday`, `Friday`, `Saturday`, `Sunday`
+    `occurrence` - (Required) The occurrence of the day in the month. Must be between `1` and `5`. `-1` for last week within the month.
   `timeouts` - (Optional) The timeouts block.
 
 Example Input:
@@ -797,7 +832,7 @@ map(object({
     interval    = optional(number, 1)
     start_time  = optional(string)
     expiry_time = optional(string)
-    timezone    = optional(string, "UTC")
+    timezone    = optional(string, "Etc/UTC")
     week_days   = optional(set(string))
     month_days  = optional(set(number))
     monthly_occurrence = optional(object({
