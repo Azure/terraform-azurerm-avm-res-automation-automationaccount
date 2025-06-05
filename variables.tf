@@ -356,7 +356,7 @@ variable "automation_job_schedules" {
   }))
   default     = {}
   description = <<-EOT
-  A map of Automation Job Schedules to be created in this Automation Account.
+  A map of Automation Job Schedules to be created in this Automation Account. You can also use the inlined 'job_schedule' property under `automation_runbooks` to create job schedules. However you should choose only one of them to manage job schedule resources.
     `runbook_key` - (Required) The key of the Runbook defined in `automation_runbooks`.
     `schedule_key` - (Required) The key of the Schedule defined in `automation_schedules`.
     `parameters` - (Optional) A map of parameters to pass to the Runbook.
@@ -590,6 +590,11 @@ variable "automation_runbooks" {
         type          = string
       })))
     }))
+    job_schedule = optional(list(object({
+      parameters    = optional(map(string))
+      run_on        = optional(string)
+      schedule_reference_key = string # Must match a key in `automation_schedules`.
+    })))
     timeouts = optional(object({
       create = optional(string)
       delete = optional(string)
@@ -629,6 +634,10 @@ variable "automation_runbooks" {
         `mandatory` - (Optional) Whether the parameter is mandatory. Defaults to `null`.
         `position` - (Optional) The position of the parameter.
         `type` - (Required) The type of the parameter.
+    `job_schedule` - (Optional) A list of job_schedule blocks as defined below. You can also use the standalone 'automation_job_schedule' variable to create job schedules. However you should choose only one of them to manage job schedule resources.
+      `parameters` - (Optional) A map of parameters to pass to the Runbook.
+      `run_on` - (Optional) The name of the Hybrid Worker Group the job will run on.
+      `schedule_reference_key` - (Required) The key of the Schedule defined in `automation_schedules`. This must match a key in `automation_schedules`.
     `timeouts` - (Optional) The timeouts block.
 
   Example Input:
@@ -675,6 +684,16 @@ variable "automation_runbooks" {
           }
         ]
       }
+      job_schedule = [
+        {
+          parameters    = {
+            param1 = "value1"
+            param2 = "value2"
+          }
+          run_on        = "Azure"
+          schedule_reference_key = "my_schedule_key1"
+        }
+      ]
       timeouts = {
         create = "30m"
         delete = "30m"
@@ -1176,7 +1195,7 @@ variable "automation_webhooks" {
     name                = string
     expiry_time         = string
     enabled             = optional(bool, true)
-    runbook_name        = string
+    runbook_key        = string
     run_on_worker_group = optional(string)
     parameters          = optional(map(string))
     uri                 = optional(string, null)
@@ -1193,7 +1212,7 @@ variable "automation_webhooks" {
     `name` - (Required) Specifies the name of the Webhook. Changing this forces a new resource to be created.
     `expiry_time` - (Required) Timestamp when the webhook expires. Changing this forces a new resource to be created.
     `enabled` - (Optional) Controls if Webhook is enabled. Defaults to `true`.
-    `runbook_name` - (Required) Name of the Automation Runbook to execute by Webhook.
+    `runbook_key` - (Required) The reference key of the Automation Runbook to execute by Webhook.
     `run_on_worker_group` - (Optional) Name of the hybrid worker group the Webhook job will run on.
     `parameters` - (Optional) Map of input parameters passed to runbook.
     `uri` - (Optional) The URI of the webhook. Changing this forces a new resource to be created.
@@ -1206,7 +1225,7 @@ variable "automation_webhooks" {
       name                = "mywebhook"
       expiry_time         = "2023-12-31T23:59:59Z"
       enabled             = true
-      runbook_name        = "myrunbook"
+      runbook_key         = "auto_runbook_key1"
       run_on_worker_group = "mygroup"
       parameters          = {"param1"="value1"}
       uri                 = "https://example.com/mywebhook"

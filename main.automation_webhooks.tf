@@ -5,7 +5,7 @@ resource "azurerm_automation_webhook" "this" {
   expiry_time             = each.value.expiry_time
   name                    = each.value.name
   resource_group_name     = azurerm_automation_account.this.resource_group_name
-  runbook_name            = each.value.runbook_name
+  runbook_name            = azurerm_automation_runbook.this[each.value.runbook_key].name
   enabled                 = each.value.enabled
   parameters              = each.value.parameters
   run_on_worker_group     = each.value.run_on_worker_group
