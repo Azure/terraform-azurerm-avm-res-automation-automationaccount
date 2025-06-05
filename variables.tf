@@ -356,7 +356,7 @@ variable "automation_job_schedules" {
   }))
   default     = {}
   description = <<-EOT
-  A map of Automation Job Schedules to be created in this Automation Account. You can also use the inlined 'job_schedule' property under `automation_runbooks` to create job schedules. However you should choose only one of them to manage job schedule resources.
+  A map of Automation Job Schedules to be created in this Automation Account. You can also use the inlined 'job_schedule' property under `automation_runbooks` to create job schedules. However you should choose only one of them to manage job schedule resources. Refer https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_job_schedule
     `runbook_key` - (Required) The key of the Runbook defined in `automation_runbooks`.
     `schedule_key` - (Required) The key of the Schedule defined in `automation_schedules`.
     `parameters` - (Optional) A map of parameters to pass to the Runbook.
@@ -593,7 +593,7 @@ variable "automation_runbooks" {
     job_schedule = optional(list(object({
       parameters    = optional(map(string))
       run_on        = optional(string)
-      schedule_reference_key = string # Must match a key in `automation_schedules`.
+      schedule_key  = string # Must match a key in `automation_schedules`.
     })))
     timeouts = optional(object({
       create = optional(string)
@@ -634,10 +634,10 @@ variable "automation_runbooks" {
         `mandatory` - (Optional) Whether the parameter is mandatory. Defaults to `null`.
         `position` - (Optional) The position of the parameter.
         `type` - (Required) The type of the parameter.
-    `job_schedule` - (Optional) A list of job_schedule blocks as defined below. You can also use the standalone 'automation_job_schedule' variable to create job schedules. However you should choose only one of them to manage job schedule resources.
+    `job_schedule` - (Optional) A list of job_schedule blocks as defined below. You can also use the standalone 'automation_job_schedule' variable to create job schedules. However you should choose only one of them to manage job schedule resources. Refer https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/automation_job_schedule
       `parameters` - (Optional) A map of parameters to pass to the Runbook.
       `run_on` - (Optional) The name of the Hybrid Worker Group the job will run on.
-      `schedule_reference_key` - (Required) The key of the Schedule defined in `automation_schedules`. This must match a key in `automation_schedules`.
+      `schedule_key` - (Required) The key of the Schedule defined in `automation_schedules`. This must match a key in `automation_schedules`.
     `timeouts` - (Optional) The timeouts block.
 
   Example Input:
@@ -691,7 +691,7 @@ variable "automation_runbooks" {
             param2 = "value2"
           }
           run_on        = "Azure"
-          schedule_reference_key = "my_schedule_key1"
+          schedule_key = "my_schedule_key1"
         }
       ]
       timeouts = {

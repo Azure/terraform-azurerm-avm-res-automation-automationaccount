@@ -56,7 +56,7 @@ resource "azurerm_automation_runbook" "this" {
     content {
       parameters    = job_schedule.value.parameters
       run_on        = job_schedule.value.run_on
-      schedule_name = azurerm_automation_schedule.this[job_schedule.value.schedule_reference_key].name
+      schedule_name = azurerm_automation_schedule.this[job_schedule.value.schedule_key].name
     }
   }
   #   content {
