@@ -722,7 +722,7 @@ variable "automation_schedules" {
     month_days  = optional(set(number))
     monthly_occurrence = optional(object({
       day       = string
-      occurence = number
+      occurrence = number
     }))
     timeouts = optional(object({
       create = optional(string)
@@ -737,7 +737,7 @@ variable "automation_schedules" {
     `name` - (Required) The name of the Schedule.
     `frequency` - (Required) The frequency of the Schedule. Possible values are `OneTime`, `Hour`, `Day`, `Week` or `Month`.
     `description` - (Optional) A description for this Schedule.
-    `interval` - (Optional) The number of `frequencys` between runs. Only valid when frequency is `Day`, `Hour`, `Week`, or `Month` and defaults to `1`.
+    `interval` - (Optional) The number of `frequency's` between runs. Only valid when frequency is `Day`, `Hour`, `Week`, or `Month` and defaults to `1`.
     `start_time` - (Optional) The start time of the Schedule. Must be at least five minutes in the future. Defaults to seven minutes in the future from the time the resource is created.
     `expiry_time` - (Optional) The expiry time of the Schedule.
     `timezone` - (Optional) The timezone of the Schedule. Defaults to `Etc/UTC`.For possible values see: https://docs.microsoft.com/en-us/rest/api/maps/timezone/gettimezoneenumwindows.
@@ -763,7 +763,7 @@ variable "automation_schedules" {
       month_days  = [1, 15, -1]
       monthly_occurrence = {
         day       = "Monday"
-        occurence = 2
+        occurrence = 2
       }
       timeouts = {
         create = "30m"

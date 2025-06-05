@@ -69,7 +69,7 @@ module "azurerm_automation_account" {
     auto_schedule_key1 = {
       name        = "TestRunbook_schedule"
       description = "This is an example schedule"
-      start_time  = "2025-06-01T00:00:00Z"
+      start_time  = "2026-06-01T00:00:00Z"
       expiry_time = "2027-12-31T00:00:00Z"
       frequency   = "Month"
       interval    = 1
@@ -84,7 +84,7 @@ module "azurerm_automation_account" {
     auto_schedule_key2 = {
       name        = "TestRunbook_schedule2"
       description = "This is an example2 schedule"
-      start_time  = "2025-07-01T00:00:00Z"
+      start_time  = "2026-07-01T00:00:00Z"
       expiry_time = "2027-12-31T00:00:00Z"
       frequency   = "Week"
       interval    = 1
