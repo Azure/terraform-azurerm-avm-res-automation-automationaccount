@@ -591,9 +591,9 @@ variable "automation_runbooks" {
       })))
     }))
     job_schedule = optional(list(object({
-      parameters    = optional(map(string))
-      run_on        = optional(string)
-      schedule_key  = string # Must match a key in `automation_schedules`.
+      parameters   = optional(map(string))
+      run_on       = optional(string)
+      schedule_key = string # Must match a key in `automation_schedules`.
     })))
     timeouts = optional(object({
       create = optional(string)
@@ -740,7 +740,7 @@ variable "automation_schedules" {
     week_days   = optional(set(string))
     month_days  = optional(set(number))
     monthly_occurrence = optional(object({
-      day       = string
+      day        = string
       occurrence = number
     }))
     timeouts = optional(object({
@@ -1195,7 +1195,7 @@ variable "automation_webhooks" {
     name                = string
     expiry_time         = string
     enabled             = optional(bool, true)
-    runbook_key        = string
+    runbook_key         = string
     run_on_worker_group = optional(string)
     parameters          = optional(map(string))
     uri                 = optional(string, null)
