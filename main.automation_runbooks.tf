@@ -50,16 +50,12 @@ resource "azurerm_automation_runbook" "this" {
       }
     }
   }
-  # Need to understand how Job_schedule needs to be configured.
-  dynamic "job_schedule" {
-    for_each = each.value.job_schedule == null ? [] : [each.value.job_schedule]
-
-    content {
-      parameters    = job_schedule.value.parameters
-      run_on        = job_schedule.value.run_on
-      schedule_name = job_schedule.value.schedule_name
-    }
-  }
+  #   content {
+  #     parameters    = job_schedule.value.parameters
+  #     run_on        = job_schedule.value.run_on
+  #     schedule_name = job_schedule.value.schedule_name
+  #   }
+  # }
   dynamic "publish_content_link" {
     for_each = each.value.publish_content_link == null ? [] : [each.value.publish_content_link]
 
