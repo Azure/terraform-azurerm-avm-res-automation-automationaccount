@@ -1,5 +1,5 @@
 resource "azurerm_automation_source_control" "this" {
-  for_each = toset(keys(var.automation_source_controls)) != null ? toset(keys(var.automation_source_controls)) : []
+  for_each = keys(var.automation_source_controls) != null ? toset(keys(var.automation_source_controls)) : []
 
   automation_account_id   = azurerm_automation_account.this.id
   folder_path             = var.automation_source_controls[each.key].folder_path
