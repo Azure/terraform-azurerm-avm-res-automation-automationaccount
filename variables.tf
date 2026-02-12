@@ -848,13 +848,6 @@ variable "automation_schedules" {
   }
 }
 
-# Token Variable definieren
-variable "automation_source_control_tokens" {
-  type        = string
-  sensitive   = true
-
-}
-
 variable "automation_source_controls" {
   type = map(object({
     name                    = string
@@ -866,6 +859,7 @@ variable "automation_source_controls" {
     description             = optional(string)
     publish_runbook_enabled = optional(bool, true)
     security = object({
+      token         = string
       token_type    = string # Personal Access Token or oauth
       refresh_token = optional(string)
     })
