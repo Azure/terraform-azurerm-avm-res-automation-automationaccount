@@ -20,6 +20,7 @@ resource "azurerm_automation_source_control" "this" {
       refresh_token = security.value.refresh_token
     }
   }
+
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
 

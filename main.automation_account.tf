@@ -16,6 +16,7 @@ resource "azurerm_automation_account" "this" {
       user_assigned_identity_id = encryption.value.user_assigned_identity_id
     }
   }
+
   #   content {
   #     type         = identity.value.type
   #     identity_ids = identity.value.identity_ids
@@ -30,6 +31,7 @@ resource "azurerm_automation_account" "this" {
       identity_ids = identity.value.user_assigned_resource_ids
     }
   }
+
   dynamic "timeouts" {
     for_each = var.timeouts == null ? [] : [var.timeouts]
 
@@ -41,6 +43,3 @@ resource "azurerm_automation_account" "this" {
     }
   }
 }
-
-
-

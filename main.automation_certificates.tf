@@ -19,5 +19,3 @@ resource "azurerm_automation_certificate" "this" {
     }
   }
 }
-
-

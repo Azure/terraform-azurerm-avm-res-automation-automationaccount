@@ -19,4 +19,3 @@ resource "azurerm_automation_credential" "this" {
     }
   }
 }
-
