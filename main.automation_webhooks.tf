@@ -24,4 +24,3 @@ resource "azurerm_automation_webhook" "this" {
 
   depends_on = [azurerm_automation_runbook.this]
 }
-

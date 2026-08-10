@@ -20,6 +20,7 @@ resource "azurerm_role_assignment" "this" {
   role_definition_name                   = strcontains(lower(each.value.role_definition_id_or_name), lower(local.role_definition_resource_substring)) ? null : each.value.role_definition_id_or_name
   skip_service_principal_aad_check       = each.value.skip_service_principal_aad_check
 }
+
 resource "azurerm_monitor_diagnostic_setting" "this" {
   for_each = var.diagnostic_settings
 
@@ -46,6 +47,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
       category_group = enabled_log.value
     }
   }
+
   dynamic "metric" {
     for_each = each.value.metric_categories
 
@@ -54,6 +56,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
     }
   }
 }
+
 resource "azurerm_automation_variable_bool" "this" {
   for_each = var.automation_variable_bools != null ? var.automation_variable_bools : {}
 
@@ -75,6 +78,7 @@ resource "azurerm_automation_variable_bool" "this" {
     }
   }
 }
+
 resource "azurerm_automation_variable_datetime" "this" {
   for_each = var.automation_variable_datetimes != null ? var.automation_variable_datetimes : {}
 
@@ -96,6 +100,7 @@ resource "azurerm_automation_variable_datetime" "this" {
     }
   }
 }
+
 resource "azurerm_automation_variable_int" "this" {
   for_each = var.automation_variable_ints != null ? var.automation_variable_ints : {}
 
@@ -117,6 +122,7 @@ resource "azurerm_automation_variable_int" "this" {
     }
   }
 }
+
 resource "azurerm_automation_variable_object" "this" {
   for_each = var.automation_variable_objects != null ? var.automation_variable_objects : {}
 
@@ -138,6 +144,7 @@ resource "azurerm_automation_variable_object" "this" {
     }
   }
 }
+
 resource "azurerm_automation_variable_string" "this" {
   for_each = var.automation_variable_strings != null ? var.automation_variable_strings : {}
 

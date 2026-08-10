@@ -21,6 +21,7 @@ resource "azurerm_automation_module" "this" {
       }
     }
   }
+
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
 
@@ -55,4 +56,4 @@ resource "azurerm_automation_powershell72_module" "this" {
       }
     }
   }
-}    
+}

@@ -21,6 +21,7 @@ resource "azurerm_automation_schedule" "this" {
       occurrence = monthly_occurrence.value.occurrence
     }
   }
+
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
 

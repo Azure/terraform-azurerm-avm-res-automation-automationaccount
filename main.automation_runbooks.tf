@@ -1,15 +1,25 @@
 resource "azurerm_automation_runbook" "this" {
   for_each = var.automation_runbooks != null ? var.automation_runbooks : {}
 
-  automation_account_name  = azurerm_automation_account.this.name
-  location                 = azurerm_automation_account.this.location
-  log_progress             = each.value.log_progress
-  log_verbose              = each.value.log_verbose
-  name                     = each.value.name
-  resource_group_name      = azurerm_automation_account.this.resource_group_name
-  runbook_type             = each.value.runbook_type
-  content                  = each.value.content
-  description              = each.value.description
+  automation_account_name = azurerm_automation_account.this.name
+  location                = azurerm_automation_account.this.location
+  log_progress            = each.value.log_progress
+  log_verbose             = each.value.log_verbose
+  name                    = each.value.name
+  resource_group_name     = azurerm_automation_account.this.resource_group_name
+  runbook_type            = each.value.runbook_type
+  content                 = each.value.content
+  description             = each.value.description
+
+  dynamic "job_schedule" {
+    for_each = each.value.job_schedule == null ? [] : each.value.job_schedule
+
+    content {
+      parameters    = job_schedule.value.parameters
+      run_on        = job_schedule.value.run_on
+      schedule_name = azurerm_automation_schedule.this[job_schedule.value.schedule_key].name
+    }
+  }
   log_activity_trace_level = each.value.log_activity_trace_level
   tags                     = each.value.tags
 
@@ -50,15 +60,7 @@ resource "azurerm_automation_runbook" "this" {
       }
     }
   }
-  dynamic "job_schedule" {
-    for_each = each.value.job_schedule == null ? [] : each.value.job_schedule
 
-    content {
-      parameters    = job_schedule.value.parameters
-      run_on        = job_schedule.value.run_on
-      schedule_name = azurerm_automation_schedule.this[job_schedule.value.schedule_key].name
-    }
-  }
   dynamic "publish_content_link" {
     for_each = each.value.publish_content_link == null ? [] : [each.value.publish_content_link]
 
@@ -76,6 +78,7 @@ resource "azurerm_automation_runbook" "this" {
       }
     }
   }
+
   dynamic "timeouts" {
     for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
 
@@ -87,4 +90,3 @@ resource "azurerm_automation_runbook" "this" {
     }
   }
 }
-
