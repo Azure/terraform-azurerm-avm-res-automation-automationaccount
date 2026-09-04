@@ -42,10 +42,10 @@ resource "azurerm_virtual_network" "this" {
 }
 
 resource "azurerm_subnet" "this" {
-  address_prefixes     = ["192.168.1.0/24"]
   name                 = "example-subnet"
   resource_group_name  = azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = ["192.168.1.0/24"]
 }
 
 resource "azurerm_network_interface" "this" {
@@ -59,6 +59,7 @@ resource "azurerm_network_interface" "this" {
     subnet_id                     = azurerm_subnet.this.id
   }
 }
+
 resource "tls_private_key" "this" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -71,21 +72,23 @@ resource "random_password" "password" {
 }
 
 resource "azurerm_windows_virtual_machine" "this" {
-  admin_password        = random_password.password.result
-  admin_username        = "testadmin"
   location              = azurerm_resource_group.this.location
   name                  = "example-vm"
   network_interface_ids = [azurerm_network_interface.this.id]
   resource_group_name   = azurerm_resource_group.this.name
   size                  = "Standard_B1s"
+  admin_password        = random_password.password.result
+  admin_username        = "testadmin"
 
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "Premium_LRS"
   }
+
   identity {
     type = "SystemAssigned" # This is required for hybrid workers
   }
+
   source_image_reference {
     offer     = "WindowsServer"
     publisher = "MicrosoftWindowsServer"
@@ -167,6 +170,7 @@ module "azurerm_automation_account" {
     environment = "development"
   }
 }
+
 resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
   name                       = "${azurerm_windows_virtual_machine.this.name}HybridWorkerExtension"
   publisher                  = "Microsoft.Azure.Automation.HybridWorker"
