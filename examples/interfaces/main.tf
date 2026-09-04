@@ -48,9 +48,9 @@ resource "azurerm_eventhub_namespace" "eventhub_namespace" {
 }
 
 resource "azurerm_eventhub" "eventhub" {
-  message_retention = 1
   name              = "acceptanceTestEventHub"
   partition_count   = 2
+  message_retention = 1
   namespace_id      = azurerm_eventhub_namespace.eventhub_namespace.id
 }
 
@@ -68,7 +68,6 @@ resource "azurerm_user_assigned_identity" "uami" {
   name                = module.naming.user_assigned_identity.name_unique
   resource_group_name = azurerm_resource_group.this.name
 }
-
 
 # This is the module call
 module "azurerm_automation_account" {
