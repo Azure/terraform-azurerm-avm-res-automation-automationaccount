@@ -23,11 +23,11 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "~> 5.0"
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.7.1"
+      version = "3.9.0"
     }
     tls = {
       source  = "hashicorp/tls"
@@ -44,7 +44,7 @@ provider "azurerm" {
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/naming/azurerm"
-  version = "0.3.0"
+  version = "0.4.3"
 }
 
 # This is required for resource modules
@@ -214,9 +214,9 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
+- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 5.0)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (3.7.1)
+- <a name="requirement_random"></a> [random](#requirement\_random) (3.9.0)
 
 - <a name="requirement_tls"></a> [tls](#requirement\_tls) (>= 4.0.0)
 
@@ -232,7 +232,7 @@ The following resources are used by this module:
 - [azurerm_virtual_machine_extension.hybrid_worker_extension](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
-- [random_password.password](https://registry.terraform.io/providers/hashicorp/random/3.7.1/docs/resources/password) (resource)
+- [random_password.password](https://registry.terraform.io/providers/hashicorp/random/3.9.0/docs/resources/password) (resource)
 - [tls_private_key.this](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) (resource)
 
 <!-- markdownlint-disable MD013 -->
@@ -262,7 +262,7 @@ Version:
 
 Source: Azure/naming/azurerm
 
-Version: 0.3.0
+Version: 0.4.3
 
 <!-- markdownlint-disable-next-line MD041 -->
 ## Data Collection
