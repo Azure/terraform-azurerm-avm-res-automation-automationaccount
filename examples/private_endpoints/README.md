@@ -162,6 +162,7 @@ module "azurerm_automation_account" {
       vm_resource_id          = azurerm_windows_virtual_machine.this.id
     }
   }
+  enable_telemetry = false
   private_endpoints = {
     pe-webhook = {
       # role_assignments   = {} # see interfaces/role assignments
