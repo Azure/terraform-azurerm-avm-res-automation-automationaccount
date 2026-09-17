@@ -116,6 +116,7 @@ module "azurerm_automation_account" {
       event_hub_name                           = azurerm_eventhub_namespace.eventhub_namespace.name
     }
   }
+  enable_telemetry = false
   managed_identities = {
     system_assigned = true
     user_assigned_resource_ids = [
