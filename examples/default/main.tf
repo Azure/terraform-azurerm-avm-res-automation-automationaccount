@@ -57,7 +57,7 @@ module "azurerm_automation_account" {
       password    = "example_pwd"
     }
   }
-  enable_telemetry              = false
+  enable_telemetry              = var.enable_telemetry
   public_network_access_enabled = true
   tags = {
     environment = "development"

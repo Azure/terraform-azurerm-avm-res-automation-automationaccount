@@ -131,7 +131,7 @@ module "azurerm_automation_account" {
       vm_resource_id          = azurerm_windows_virtual_machine.this.id
     }
   }
-  enable_telemetry              = false
+  enable_telemetry              = var.enable_telemetry
   public_network_access_enabled = true
   tags = {
     environment = "development"

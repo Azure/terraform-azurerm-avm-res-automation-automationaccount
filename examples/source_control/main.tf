@@ -34,7 +34,7 @@ module "azurerm_automation_account" {
   name                          = module.naming.automation_account.name_unique
   resource_group_name           = azurerm_resource_group.this.name
   sku                           = "Basic"
-  enable_telemetry              = false
+  enable_telemetry              = var.enable_telemetry
   public_network_access_enabled = false
   tags = {
     environment = "development"
