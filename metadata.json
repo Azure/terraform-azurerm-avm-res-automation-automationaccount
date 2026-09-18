@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Automation Account",
+  "moduleDescription": "AVM Resource Module for Automation Account",
+  "canonicalType": "Microsoft.Automation/automationAccounts",
+  "owners": [
+    "didayal-msft",
+    "Poven795909"
+  ],
+  "telemetryIdPrefix": "46d3xtrf.res.1f54d3f"
+}
