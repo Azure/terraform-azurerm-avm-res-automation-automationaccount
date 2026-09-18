@@ -120,7 +120,7 @@ module "azurerm_automation_account" {
       }
     }
   }
-  enable_telemetry              = false
+  enable_telemetry              = var.enable_telemetry
   public_network_access_enabled = false
   tags = {
     environment = "development"
