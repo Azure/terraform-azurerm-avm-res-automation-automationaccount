@@ -1,15 +1,7 @@
-# terraform-azurerm-avm-template
+# Automation Account
 
-This is a template repo for Terraform Azure Verified Modules.
+Deploys an Automation Account and its optional automation resources and private endpoints.
 
-Things to do:
+This module requires AzureRM v4. Consumers using v3 or v5 must select a compatible v4 provider; existing resource addresses are unchanged. Provider compatibility with existing v5 state must be reviewed before applying.
 
-1. Set up a GitHub repo environment called `test`.
-1. Configure environment protection rule to ensure that approval is required before deploying to this environment.
-1. Create a user-assigned managed identity in your test subscription.
-1. Create a role assignment for the managed identity on your test subscription, use the minimum required role.
-1. Configure federated identity credentials on the user assigned managed identity. Use the GitHub environment.
-1. Create the following environment secrets on the `test` environment:
-   1. AZURE_CLIENT_ID
-   1. AZURE_TENANT_ID
-   1. AZURE_SUBSCRIPTION_ID
+Private endpoint IP configurations accept a per-IP `member_name`, falling back to the endpoint's `subresource_name`. Optional endpoint locks and role assignments are implemented with AzAPI in either DNS-management mode. Endpoint role assignments do not perform an Azure Active Directory lookup, so `skip_service_principal_aad_check` is retained for the common interface but has no effect.
