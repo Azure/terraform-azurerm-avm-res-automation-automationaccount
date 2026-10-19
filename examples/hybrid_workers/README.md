@@ -27,7 +27,7 @@ terraform {
     }
     random = {
       source  = "hashicorp/random"
-      version = "3.7.1"
+      version = "3.9.1"
     }
     tls = {
       source  = "hashicorp/tls"
@@ -183,7 +183,7 @@ The following requirements are needed by this module:
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
 
-- <a name="requirement_random"></a> [random](#requirement\_random) (3.7.1)
+- <a name="requirement_random"></a> [random](#requirement\_random) (3.9.1)
 
 - <a name="requirement_tls"></a> [tls](#requirement\_tls) (>= 4.0.0)
 
@@ -197,7 +197,7 @@ The following resources are used by this module:
 - [azurerm_virtual_machine_extension.hybrid_worker_extension](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
 - [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
 - [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
-- [random_password.password](https://registry.terraform.io/providers/hashicorp/random/3.7.1/docs/resources/password) (resource)
+- [random_password.password](https://registry.terraform.io/providers/hashicorp/random/3.9.1/docs/resources/password) (resource)
 - [tls_private_key.this](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) (resource)
 
 <!-- markdownlint-disable MD013 -->
