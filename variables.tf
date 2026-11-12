@@ -557,8 +557,8 @@ variable "automation_runbooks" {
   type = map(object({
     name                     = string
     runbook_type             = string
-    log_progress             = bool
-    log_verbose              = bool
+    log_progress             = optional(bool, true)
+    log_verbose              = optional(bool, true)
     description              = optional(string, "test")
     content                  = optional(string, null)
     tags                     = optional(map(string))
@@ -607,7 +607,7 @@ variable "automation_runbooks" {
   A list of Automation Runbooks which should be created in this Automation Account.
     `name` - (Required) The name of the Runbook.
     `runbook_type` - (Required) The type of the Runbook. Possible values are `PowerShell`, `PowerShellWorkflow`, `Graph`, `GraphPowerShell`, `GraphPowerShellWorkflow`, `PowerShell72`, `Python3`, `Python2` or `Script`.
-    `log_process` - (Required) Whether to log process details. Defaults to `true`.
+    `log_progress` - (Required) Whether to log process details. Defaults to `true`.
     `log_verbose` - (Required) Whether to log verbose details. Defaults to `true`.
     `description` - (Optional) A description for this Runbook.
     `content` - (Optional) The content of the Runbook. Required if `publish_content_link` is not specified.
