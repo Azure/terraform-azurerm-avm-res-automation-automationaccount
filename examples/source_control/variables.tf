@@ -1,3 +1,9 @@
+variable "security_token" {
+  type        = string
+  description = "The personal access token for the source control."
+  sensitive   = true
+}
+
 variable "enable_telemetry" {
   type        = bool
   default     = true

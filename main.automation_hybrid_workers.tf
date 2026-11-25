@@ -1,13 +1,24 @@
-resource "azurerm_automation_hybrid_runbook_worker_group" "this" {
+resource "azapi_resource" "automation_accounts_hybrid_runbook_worker_group" {
   for_each = var.automation_hybrid_runbook_worker_groups != null ? var.automation_hybrid_runbook_worker_groups : {}
 
-  automation_account_name = azurerm_automation_account.this.name
-  name                    = each.value.name
-  resource_group_name     = azurerm_automation_account.this.resource_group_name
-  credential_name         = each.value.credential_name
+  name      = each.value.name
+  parent_id = azapi_resource.this.id
+  type      = var.resource_types.automation_automation_accounts_hybrid_runbook_worker_groups
+  body = {
+    properties = {
+      credential = {
+        name = each.value.credential_name
+      }
+    }
+  }
+  ignore_body_changes = length(var.ignore_body_changes.automation_automation_accounts_hybrid_runbook_worker_groups) > 0 ? var.ignore_body_changes.automation_automation_accounts_hybrid_runbook_worker_groups : null
+  # Azure picks its own destination type when none is requested.
+  ignore_null_property   = true
+  response_export_values = []
+  retry                  = var.retry
 
   dynamic "timeouts" {
-    for_each = each.value.timeouts == null ? [] : [each.value.timeouts]
+    for_each = var.timeouts == null ? [] : [var.timeouts]
 
     content {
       create = timeouts.value.create
@@ -18,16 +29,45 @@ resource "azurerm_automation_hybrid_runbook_worker_group" "this" {
   }
 }
 
+moved {
+  from = azurerm_automation_hybrid_runbook_worker_group.this
+  to   = azapi_resource.automation_accounts_hybrid_runbook_worker_group
+}
+
 resource "random_uuid" "this" {
   for_each = var.automation_hybrid_runbook_workers != null ? var.automation_hybrid_runbook_workers : {}
 }
 
-resource "azurerm_automation_hybrid_runbook_worker" "this" {
+resource "azapi_resource" "automation_accounts_hybrid_runbook_worker_groups_workers" {
   for_each = var.automation_hybrid_runbook_workers != null ? var.automation_hybrid_runbook_workers : {}
 
-  automation_account_name = azurerm_automation_account.this.name
-  resource_group_name     = azurerm_automation_account.this.resource_group_name
-  vm_resource_id          = each.value.vm_resource_id
-  worker_group_name       = azurerm_automation_hybrid_runbook_worker_group.this[each.value.hybrid_worker_group_key].name
-  worker_id               = random_uuid.this[each.key].result
+  name      = random_uuid.this[each.key].result
+  parent_id = azapi_resource.automation_accounts_hybrid_runbook_worker_group[each.value.hybrid_worker_group_key].id
+  type      = var.resource_types.automation_automation_accounts_hybrid_runbook_worker_groups_hybrid_runbook_workers
+  body = {
+    properties = {
+      vmResourceId = each.value.vm_resource_id
+    }
+  }
+  ignore_body_changes = length(var.ignore_body_changes.automation_automation_accounts_hybrid_runbook_worker_groups_hybrid_runbook_workers) > 0 ? var.ignore_body_changes.automation_automation_accounts_hybrid_runbook_worker_groups_hybrid_runbook_workers : null
+  # Azure picks its own destination type when none is requested.
+  ignore_null_property   = true
+  response_export_values = []
+  retry                  = var.retry
+
+  dynamic "timeouts" {
+    for_each = var.timeouts == null ? [] : [var.timeouts]
+
+    content {
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
+}
+
+moved {
+  from = azurerm_automation_hybrid_runbook_worker.this
+  to   = azapi_resource.automation_accounts_hybrid_runbook_worker_groups_workers
 }

@@ -1,54 +1,75 @@
-resource "azurerm_automation_connection" "this" {
-  for_each = var.automation_connections != null ? var.automation_connections : {}
+resource "azapi_resource" "automation_account_connections" {
+  for_each = local.automation_connections
 
-  automation_account_name = azurerm_automation_account.this.name
-  name                    = each.value.name
-  resource_group_name     = azurerm_automation_account.this.resource_group_name
-  type                    = each.value.type
-  values                  = each.value.values
-  description             = each.value.description
+  name      = each.value.name
+  parent_id = azapi_resource.this.id
+  type      = var.resource_types.automation_automation_accounts_connections
+  body = {
+    properties = {
+      connectionType = {
+        name = each.value.type
+      }
+      description           = each.value.description
+      fieldDefinitionValues = each.value.values
+    }
+  }
+  ignore_body_changes = length(var.ignore_body_changes.automation_automation_accounts_connections) > 0 ? var.ignore_body_changes.automation_automation_accounts_connections : null
+  replace_triggers_refs = [
+    "properties.connectionType.name",
+  ]
+  response_export_values = []
+  retry                  = var.retry
 
   dynamic "timeouts" {
-    for_each = each.value.timeouts != null ? { "dummy_key" : each.value.timeouts } : {}
+    for_each = each.value.timeouts != null ? [each.value.timeouts] : (var.timeouts == null ? [] : [var.timeouts])
 
     content {
-      create = each.value.timeouts.create
-      delete = each.value.timeouts.delete
-      read   = each.value.timeouts.read
-      update = each.value.timeouts.update
+      create = timeouts.value.create
+      delete = timeouts.value.delete
+      read   = timeouts.value.read
+      update = timeouts.value.update
+    }
+  }
+
+  lifecycle {
+    precondition {
+      condition = alltrue([
+        for field in lookup({
+          Azure                   = ["AutomationCertificateName", "SubscriptionID"]
+          AzureServicePrincipal   = ["TenantId", "ApplicationId", "CertificateThumbprint", "SubscriptionId"]
+          AzureClassicCertificate = ["SubscriptionId", "SubscriptionName", "CertificateAssetName"]
+        }, each.value.type, []) : contains(keys(each.value.values), field)
+      ])
+      error_message = "The merged connection values must include all required fields for the selected built-in connection type."
     }
   }
 }
 
-resource "azurerm_automation_connection_certificate" "this" {
-  for_each = var.automation_connection_certificates != null ? var.automation_connection_certificates : {}
-
-  automation_account_name     = azurerm_automation_account.this.name
-  automation_certificate_name = each.value.automation_certificate_name
-  name                        = azurerm_automation_connection.this[each.value.connection_key].name
-  resource_group_name         = azurerm_automation_account.this.resource_group_name
-  subscription_id             = each.value.subscription_id
+moved {
+  from = azurerm_automation_connection.this
+  to   = azapi_resource.automation_account_connections
 }
 
-resource "azurerm_automation_connection_service_principal" "this" {
-  for_each = var.automation_connection_service_principals != null ? var.automation_connection_service_principals : {}
+removed {
+  from = azurerm_automation_connection_certificate.this
 
-  application_id          = each.value.application_id
-  automation_account_name = azurerm_automation_account.this.name
-  certificate_thumbprint  = each.value.certificate_thumbprint
-  name                    = azurerm_automation_connection.this[each.value.connection_key].name
-  resource_group_name     = azurerm_automation_account.this.resource_group_name
-  subscription_id         = each.value.subscription_id
-  tenant_id               = each.value.tenant_id
+  lifecycle {
+    destroy = false
+  }
 }
 
-resource "azurerm_automation_connection_classic_certificate" "this" {
-  for_each = var.automation_connection_classic_certificates != null ? var.automation_connection_classic_certificates : {}
+removed {
+  from = azurerm_automation_connection_service_principal.this
 
-  automation_account_name = azurerm_automation_account.this.name
-  certificate_asset_name  = each.value.certificate_asset_name
-  name                    = azurerm_automation_connection.this[each.value.connection_key].name
-  resource_group_name     = azurerm_automation_account.this.resource_group_name
-  subscription_id         = each.value.subscription_id
-  subscription_name       = each.value.subscription_name
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = azurerm_automation_connection_classic_certificate.this
+
+  lifecycle {
+    destroy = false
+  }
 }

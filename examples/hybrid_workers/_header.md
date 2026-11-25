@@ -13,3 +13,7 @@ Things to do:
    1. AZURE_CLIENT_ID
    1. AZURE_TENANT_ID
    1. AZURE_SUBSCRIPTION_ID
+
+## Availability zone selection
+
+This example explicitly places its supporting VM in availability zone `1`. Confirm that the VM SKU and zone are available in the deployment subscription and region before running E2E tests. Adding or changing a zone can require recreating an existing VM; a single zonal VM is not a multi-zone high-availability deployment.
