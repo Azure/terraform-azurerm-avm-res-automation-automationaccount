@@ -6,19 +6,14 @@ This deploys the module in its simplest form.
 
 ```hcl
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.11, < 2.0"
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.12"
     }
   }
-}
-
-provider "azurerm" {
-  features {}
-  # subscription_id = "your-subscription-id" # Replace with your Azure subscription ID
 }
 
 # This ensures we have unique CAF compliant names for our resources.
@@ -28,21 +23,24 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
+resource "azapi_resource" "resource_group" {
   location = "centralindia"
   name     = module.naming.resource_group.name_unique
+  type     = "Microsoft.Resources/resourceGroups@2025-04-01"
 }
 
-data "azurerm_client_config" "example" {}
+data "azapi_client_config" "current" {}
 
 # This is the module call
-module "azurerm_automation_account" {
+module "automation_account" {
   source = "../../"
 
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.automation_account.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "Basic"
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.automation_account.name_unique
+  parent_id = azapi_resource.resource_group.id
+  sku = {
+    name = "Basic"
+  }
   automation_connections = {
     auto_conn_key1 = {
       name        = "example-connection"
@@ -50,8 +48,8 @@ module "azurerm_automation_account" {
       type        = "AzureServicePrincipal"
       values = {
         "ApplicationId" : "00000000-0000-0000-0000-000000000000",
-        "TenantId" : data.azurerm_client_config.example.tenant_id,
-        "SubscriptionId" : data.azurerm_client_config.example.subscription_id,
+        "TenantId" : data.azapi_client_config.current.tenant_id,
+        "SubscriptionId" : data.azapi_client_config.current.subscription_id,
         "CertificateThumbprint" : "sample-certificate-thumbprint",
       }
     }
@@ -77,16 +75,16 @@ module "azurerm_automation_account" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.11, < 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
 ## Resources
 
 The following resources are used by this module:
 
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [azurerm_client_config.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
+- [azapi_resource.resource_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_client_config.current](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs
@@ -115,7 +113,7 @@ No outputs.
 
 The following Modules are called:
 
-### <a name="module_azurerm_automation_account"></a> [azurerm\_automation\_account](#module\_azurerm\_automation\_account)
+### <a name="module_automation_account"></a> [automation\_account](#module\_automation\_account)
 
 Source: ../../
 

@@ -16,14 +16,20 @@ Things to do:
    1. AZURE\_TENANT\_ID
    1. AZURE\_SUBSCRIPTION\_ID
 
+## Availability zone selection
+
+This example explicitly places its supporting VM in availability zone `1`. Confirm that the VM SKU and zone are available in the deployment subscription and region before running E2E tests. Adding or changing a zone can require recreating an existing VM; a single zonal VM is not a multi-zone high-availability deployment.
+
+Availability of `Standard_B1s` in `centralindia`, including individual zones, depends on subscription restrictions. Verify the SKU before deployment and select an available SKU or test environment when required; passing policy checks does not remove subscription restrictions.
+
 ```hcl
 terraform {
-  required_version = ">= 1.9, < 2.0"
+  required_version = ">= 1.11, < 2.0"
 
   required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.12"
     }
     random = {
       source  = "hashicorp/random"
@@ -36,11 +42,6 @@ terraform {
   }
 }
 
-provider "azurerm" {
-  features {}
-  # subscription_id = "your-subscription-id" # Replace with your Azure subscription ID
-}
-
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
   source  = "Azure/avm-utl-naming/azure"
@@ -48,34 +49,59 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
+resource "azapi_resource" "resource_group" {
   location = "centralindia"
   name     = module.naming.resource_group.name_unique
+  type     = "Microsoft.Resources/resourceGroups@2025-04-01"
 }
 
-resource "azurerm_virtual_network" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = "example-vnet"
-  resource_group_name = azurerm_resource_group.this.name
-  address_space       = ["192.168.1.0/24"]
+resource "azapi_resource" "virtual_network" {
+  location  = azapi_resource.resource_group.location
+  name      = "example-vnet"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Network/virtualNetworks@2026-03-01"
+  body = {
+    properties = {
+      addressSpace = {
+        addressPrefixes = ["192.168.1.0/24"]
+      }
+    }
+  }
 }
 
-resource "azurerm_subnet" "this" {
-  name                 = "example-subnet"
-  resource_group_name  = azurerm_resource_group.this.name
-  virtual_network_name = azurerm_virtual_network.this.name
-  address_prefixes     = ["192.168.1.0/24"]
+resource "azapi_resource" "subnet" {
+  name      = "example-subnet"
+  parent_id = azapi_resource.virtual_network.id
+  type      = "Microsoft.Network/virtualNetworks/subnets@2026-03-01"
+  body = {
+    properties = {
+      addressPrefix         = "192.168.1.0/24"
+      defaultOutboundAccess = true
+    }
+  }
 }
 
-resource "azurerm_network_interface" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = "example-nic"
-  resource_group_name = azurerm_resource_group.this.name
-
-  ip_configuration {
-    name                          = "vm-example"
-    private_ip_address_allocation = "Dynamic"
-    subnet_id                     = azurerm_subnet.this.id
+resource "azapi_resource" "network_interface" {
+  location  = azapi_resource.resource_group.location
+  name      = "example-nic"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Network/networkInterfaces@2026-03-01"
+  body = {
+    properties = {
+      ipConfigurations = [
+        {
+          name = "testconfiguration1"
+          properties = {
+            primary                   = true
+            privateIPAddressVersion   = "IPv4"
+            privateIPAllocationMethod = "Dynamic"
+            subnet = {
+              id = azapi_resource.subnet.id
+            }
+          }
+        }
+      ]
+    }
   }
 }
 
@@ -90,52 +116,94 @@ resource "random_password" "password" {
   special          = true
 }
 
-resource "azurerm_windows_virtual_machine" "this" {
-  location              = azurerm_resource_group.this.location
-  name                  = "example-vm"
-  network_interface_ids = [azurerm_network_interface.this.id]
-  resource_group_name   = azurerm_resource_group.this.name
-  size                  = "Standard_B1s"
-  admin_password        = random_password.password.result
-  admin_username        = "testadmin"
-
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+resource "azapi_resource" "virtual_machine" {
+  location  = azapi_resource.resource_group.location
+  name      = "example-vm"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Compute/virtualMachines@2023-03-01"
+  body = {
+    zones = ["1"]
+    properties = {
+      hardwareProfile = {
+        vmSize = "Standard_B1s"
+      }
+      networkProfile = {
+        networkInterfaces = [
+          {
+            id = azapi_resource.network_interface.id
+          }
+        ]
+      }
+      osProfile = {
+        computerName  = "example-vm"
+        adminUsername = "testadmin"
+      }
+      storageProfile = {
+        osDisk = {
+          caching      = "ReadWrite"
+          createOption = "FromImage"
+          name         = "osdisk"
+          managedDisk = {
+            storageAccountType = "Premium_LRS"
+          }
+        }
+        imageReference = {
+          publisher = "MicrosoftWindowsServer"
+          offer     = "WindowsServer"
+          sku       = "2016-Datacenter"
+          version   = "latest"
+        }
+      }
+    }
+  }
+  sensitive_body = {
+    properties = {
+      osProfile = {
+        adminPassword = random_password.password.result
+      }
+    }
+  }
+  sensitive_body_version = {
+    "properties.osProfile.adminPassword" = "1"
   }
 
   identity {
-    type = "SystemAssigned" # This is required for hybrid workers
-  }
-
-  source_image_reference {
-    offer     = "WindowsServer"
-    publisher = "MicrosoftWindowsServer"
-    sku       = "2016-Datacenter"
-    version   = "latest"
+    type = "SystemAssigned"
   }
 }
 
-resource "azurerm_private_dns_zone" "this" {
-  name                = "privatelink.azure-automation.net"
-  resource_group_name = azurerm_resource_group.this.name
+resource "azapi_resource" "private_dns_zone" {
+  location  = "global"
+  name      = "privatelink.azure-automation.net"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Network/privateDnsZones@2024-06-01"
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "example" {
-  name                  = "example-link"
-  private_dns_zone_name = azurerm_private_dns_zone.this.name
-  resource_group_name   = azurerm_resource_group.this.name
-  virtual_network_id    = azurerm_virtual_network.this.id
+resource "azapi_resource" "symbolicname" {
+  location  = "global"
+  name      = "example-link"
+  parent_id = azapi_resource.private_dns_zone.id
+  type      = "Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01"
+  body = {
+    properties = {
+      registrationEnabled = false
+      virtualNetwork = {
+        id = azapi_resource.virtual_network.id
+      }
+    }
+  }
 }
 
 # This is the module call
-module "azurerm_automation_account" {
+module "automation_account" {
   source = "../../"
 
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.automation_account.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "Basic"
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.automation_account.name_unique
+  parent_id = azapi_resource.resource_group.id
+  sku = {
+    name = "Basic"
+  }
   automation_credentials = {
     cred_1_key = {
       name        = "admin-password-credential"
@@ -152,14 +220,14 @@ module "azurerm_automation_account" {
   }
   automation_hybrid_runbook_worker_groups = {
     hybrid_worker_group_1_key = {
-      name = "hybrid_worker_group_1"
-      # credential_name = "admin-password-credential"
+      name            = "hybrid_worker_group_1"
+      credential_name = "admin-password-credential"
     }
   }
   automation_hybrid_runbook_workers = {
     hybrid_worker_1_key = {
       hybrid_worker_group_key = "hybrid_worker_group_1_key"
-      vm_resource_id          = azurerm_windows_virtual_machine.this.id
+      vm_resource_id          = azapi_resource.virtual_machine.id
     }
   }
   enable_telemetry = var.enable_telemetry
@@ -169,19 +237,19 @@ module "azurerm_automation_account" {
       # lock               = {} # see interfaces/resource locks
       # tags               = {} # see interfaces/tags
       name                          = "pe-webhook"
-      subnet_resource_id            = azurerm_subnet.this.id
+      subnet_resource_id            = azapi_resource.subnet.id
       network_interface_name        = "nic1"
       subresource_name              = "Webhook"
       private_dns_zone_group_name   = "privatelink.azure-automation.net"
-      private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
+      private_dns_zone_resource_ids = [azapi_resource.private_dns_zone.id]
     }
     pe-hybridworker = {
       name                          = "pe-hyrbidworker"
-      subnet_resource_id            = azurerm_subnet.this.id
+      subnet_resource_id            = azapi_resource.subnet.id
       network_interface_name        = "nic2"
       subresource_name              = "DSCAndHybridWorker"
       private_dns_zone_group_name   = "privatelink.azure-automation.net"
-      private_dns_zone_resource_ids = [azurerm_private_dns_zone.this.id]
+      private_dns_zone_resource_ids = [azapi_resource.private_dns_zone.id]
     }
   }
   private_endpoints_manage_dns_zone_group = true
@@ -191,20 +259,28 @@ module "azurerm_automation_account" {
   }
 }
 
-resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
-  name                       = "${azurerm_windows_virtual_machine.this.name}HybridWorkerExtension"
-  publisher                  = "Microsoft.Azure.Automation.HybridWorker"
-  type                       = "HybridWorkerForwindows"
-  type_handler_version       = "1.1"
-  virtual_machine_id         = azurerm_windows_virtual_machine.this.id
-  auto_upgrade_minor_version = true
-  settings                   = <<SETTINGS
-    {
-      "AutomationAccountURL": "${module.azurerm_automation_account.hybrid_service_url}"
+resource "azapi_resource" "hybrid_worker_extension" {
+  location  = azapi_resource.virtual_machine.location
+  name      = "${azapi_resource.virtual_machine.name}HybridWorkerExtension"
+  parent_id = azapi_resource.virtual_machine.id
+  type      = "Microsoft.Compute/virtualMachines/extensions@2026-04-01"
+  body = {
+    properties = {
+      autoUpgradeMinorVersion = true
+      publisher               = "Microsoft.Azure.Automation.HybridWorker"
+      settings = {
+        AutomationAccountURL = module.automation_account.hybrid_service_url
+      }
+      type               = "HybridWorkerForwindows"
+      typeHandlerVersion = "1.1"
     }
-  SETTINGS
+  }
+  response_export_values = []
+  retry = {
+    error_message_regex = ["HybridRunbookWorkerGroupNotFound", "AutomationAccountNotFound"]
+  }
 
-  depends_on = [azurerm_windows_virtual_machine.this, module.azurerm_automation_account]
+  depends_on = [azapi_resource.virtual_machine, module.automation_account]
 }
 ```
 
@@ -213,9 +289,9 @@ resource "azurerm_virtual_machine_extension" "hybrid_worker_extension" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.11, < 2.0)
 
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 4.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (3.7.1)
 
@@ -225,14 +301,14 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_network_interface.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_interface) (resource)
-- [azurerm_private_dns_zone.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) (resource)
-- [azurerm_private_dns_zone_virtual_network_link.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) (resource)
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
-- [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) (resource)
-- [azurerm_virtual_machine_extension.hybrid_worker_extension](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_machine_extension) (resource)
-- [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) (resource)
-- [azurerm_windows_virtual_machine.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/windows_virtual_machine) (resource)
+- [azapi_resource.hybrid_worker_extension](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.network_interface](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_dns_zone](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.resource_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.subnet](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.symbolicname](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.virtual_machine](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.virtual_network](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [random_password.password](https://registry.terraform.io/providers/hashicorp/random/3.7.1/docs/resources/password) (resource)
 - [tls_private_key.this](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/resources/private_key) (resource)
 
@@ -263,7 +339,7 @@ No outputs.
 
 The following Modules are called:
 
-### <a name="module_azurerm_automation_account"></a> [azurerm\_automation\_account](#module\_azurerm\_automation\_account)
+### <a name="module_automation_account"></a> [automation\_account](#module\_automation\_account)
 
 Source: ../../
 

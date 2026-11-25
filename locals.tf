@@ -1,58 +1,36 @@
 locals {
-  managed_identities = {
-    system_assigned_user_assigned = (var.managed_identities.system_assigned || length(var.managed_identities.user_assigned_resource_ids) > 0) ? {
-      this = {
-        type                       = var.managed_identities.system_assigned && length(var.managed_identities.user_assigned_resource_ids) > 0 ? "SystemAssigned, UserAssigned" : length(var.managed_identities.user_assigned_resource_ids) > 0 ? "UserAssigned" : "SystemAssigned"
-        user_assigned_resource_ids = var.managed_identities.user_assigned_resource_ids
-      }
-    } : {}
-    system_assigned = var.managed_identities.system_assigned ? {
-      this = {
-        type = "SystemAssigned"
-      }
-    } : {}
-    user_assigned = length(var.managed_identities.user_assigned_resource_ids) > 0 ? {
-      this = {
-        type                       = "UserAssigned"
-        user_assigned_resource_ids = var.managed_identities.user_assigned_resource_ids
-      }
-    } : {}
-  }
-  private_endpoints = merge(
-    azurerm_private_endpoint.this_managed_dns_zone_groups,
-    azurerm_private_endpoint.this_unmanaged_dns_zone_groups,
+  customer_managed_encryption     = var.customer_managed_key != null || var.encryption.key_source == "Microsoft.KeyVault"
+  encryption_identity_resource_id = var.customer_managed_key != null ? try(var.customer_managed_key.user_assigned_identity.resource_id, null) : var.encryption.user_assigned_identity_id
+  encryption_key_name             = var.customer_managed_key != null ? var.customer_managed_key.key_name : try(split("/", var.encryption.key_vault_key_id)[4], null)
+  encryption_key_version          = var.customer_managed_key != null ? var.customer_managed_key.key_version : try(split("/", var.encryption.key_vault_key_id)[5], null)
+  encryption_vault_uri            = var.customer_managed_key != null ? data.azapi_resource.encryption_key_vault[0].output.properties.vaultUri : try("https://${split("/", var.encryption.key_vault_key_id)[2]}", null)
+  all_role_assignments = merge(
+    { for key, assignment in var.role_assignments : jsonencode(["root", key]) => assignment },
+    {
+      for key, assignment in local.private_endpoint_assignments : assignment.interface_key => merge(assignment.assignment, {
+        name = assignment.assignment.name != null ? assignment.assignment.name : random_uuid.private_endpoint_role_assignments[key].result
+      })
+    },
   )
-  private_endpoint_application_security_group_associations = { for assoc in flatten([
-    for pe_k, pe_v in var.private_endpoints : [
-      for asg_k, asg_v in pe_v.application_security_group_associations : {
-        asg_key         = asg_k
-        pe_key          = pe_k
-        asg_resource_id = asg_v
-      }
-    ]
-  ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
-  private_endpoint_role_assignments = {
-    for assignment in flatten([
-      for pe_key, endpoint in var.private_endpoints : [
-        for assignment_key, assignment in endpoint.role_assignments : {
-          pe_key         = pe_key
-          assignment_key = assignment_key
-          assignment     = assignment
-        }
-      ]
-    ]) : jsonencode([assignment.pe_key, assignment.assignment_key]) => assignment
+  # Role names are matched case-insensitively, as the AzureRM provider matched them.
+  role_definition_ids_by_name = length(local.all_role_assignments) > 0 ? {
+    for definition in data.azapi_resource_list.role_definitions[0].output.results : lower(definition.role_name) => definition.id...
+  } : {}
+  role_definition_resource_substring = "/providers/microsoft.authorization/roledefinitions/"
+  role_assignments = {
+    for key, assignment in local.all_role_assignments : key => merge(assignment, {
+      # The AzureRM provider sent this principal type when the flag was set, which skips the Entra ID
+      # existence check that fails for newly created service principals.
+      principal_type = assignment.principal_type == null && assignment.skip_service_principal_aad_check ? "ServicePrincipal" : assignment.principal_type
+      # Names resolve to IDs. Tenant-level IDs are qualified with the subscription, which is the form
+      # Azure returns, so that the configuration and the deployed assignment compare equal.
+      role_definition_id_or_name = (
+        !strcontains(lower(assignment.role_definition_id_or_name), local.role_definition_resource_substring) ? try(local.role_definition_ids_by_name[lower(assignment.role_definition_id_or_name)][0], assignment.role_definition_id_or_name) :
+        startswith(lower(assignment.role_definition_id_or_name), "/providers/") ? "/subscriptions/${local.subscription_id}${assignment.role_definition_id_or_name}" :
+        assignment.role_definition_id_or_name
+      )
+    })
   }
-  private_endpoint_role_definition_names = {
-    for key, definitions in data.azapi_resource_list.private_endpoint_role_definitions : key => {
-      for definition in definitions.output.results : definition.role_name => definition.id
-    }
-  }
-  private_endpoint_role_definition_ids = {
-    for key, assignment in local.private_endpoint_role_assignments : key => (
-      can(provider::azapi::parse_resource_id("Microsoft.Authorization/roleDefinitions", assignment.assignment.role_definition_id_or_name)) ?
-      assignment.assignment.role_definition_id_or_name :
-      lookup(local.private_endpoint_role_definition_names[assignment.pe_key], assignment.assignment.role_definition_id_or_name, null)
-    )
-  }
-  role_definition_resource_substring = "providers/Microsoft.Authorization/roleDefinitions"
+  subscription_id = provider::azapi::parse_resource_id("Microsoft.Resources/resourceGroups", var.parent_id).subscription_id
+
 }
